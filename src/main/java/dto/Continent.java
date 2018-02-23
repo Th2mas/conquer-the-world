@@ -21,6 +21,11 @@ public class Continent {
     private final int points;
 
     /**
+     * The continent's name
+     */
+    private final String name;
+
+    /**
      * The continent's color
      */
     private Color color;
@@ -30,9 +35,10 @@ public class Continent {
      * Parameters cannot be null
      * @param countries the continent's countries
      * @param points the continent's points
+     * @param name the continent's name
      */
-    public Continent(List<Country> countries, int points) {
-        this(countries, points, Color.WHITE);
+    public Continent(List<Country> countries, int points, String name) {
+        this(countries, points, Color.WHITE, name);
     }
 
     /**
@@ -40,10 +46,12 @@ public class Continent {
      * @param countries the continent's countries
      * @param points the continent's points
      * @param color the continent's color
+     * @param name the continent's name
      */
-    public Continent(List<Country> countries, int points, Color color){
+    public Continent(List<Country> countries, int points, Color color, String name){
         Objects.requireNonNull(countries);
         Objects.requireNonNull(color);
+        Objects.requireNonNull(name);
 
         // 'points' must be greater than 0
         if(points <= 0) throw new IllegalArgumentException("points cannot be less or equal than 0!");
@@ -51,6 +59,7 @@ public class Continent {
         this.countries = countries;
         this.points = points;
         this.color = color;
+        this.name = name;
     }
 
     /**
@@ -85,6 +94,14 @@ public class Continent {
         this.color = color;
     }
 
+    /**
+     * Gets the continent's name
+     * @return name
+     */
+    public String getName() {
+        return name;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -92,12 +109,13 @@ public class Continent {
         Continent continent = (Continent) o;
         return points == continent.points &&
                 Objects.equals(countries, continent.countries) &&
+                Objects.equals(name, continent.name) &&
                 Objects.equals(color, continent.color);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(countries, points, color);
+        return Objects.hash(countries, points, name, color);
     }
 
     @Override
@@ -105,6 +123,7 @@ public class Continent {
         return "Continent{" +
                 "countries=" + countries +
                 ", points=" + points +
+                ", name='" + name + '\'' +
                 ", color=" + color +
                 '}';
     }

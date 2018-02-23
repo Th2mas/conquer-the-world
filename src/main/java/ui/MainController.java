@@ -1,9 +1,10 @@
 package ui;
 
 import javafx.fxml.FXML;
+import javafx.scene.Group;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
-
-import java.util.Optional;
+import ui.game.LoaderController;
 
 /**
  * The main controller for the application
@@ -13,31 +14,41 @@ public class MainController {
     /**
      * The optional primary stage for closing the stage on close request
      */
-    private Optional<Stage> primaryStage;
+    private Stage primaryStage;
+
+    private LoaderController loaderController;
 
     /**
-     * Creates a new main controller
+     * The root group
      */
-    public MainController(){
-        //mapReader = new SimpleMapReader();
-        primaryStage = Optional.empty();
-    }
+    @FXML
+    private Group root;
+
 
     @FXML
     public void initialize(){
-        /*
-        // TODO: Move me to a continent controller!
-        // Read the map file
-        // If anything goes wrong: display an error message
-        List<Continent> continentList;
-        try { continentList = mapReader.readFile(MainController.class.getResource("/map/world.map").getPath()); }
-        catch (Exception e){
-            ErrorDialog.showErrorDialog(e.getLocalizedMessage());
-            primaryStage.ifPresent(Stage::close);
-            return;
-        }
-        // Now we have all continents
-        */
+        loaderController = new LoaderController(root);
+
+        // TODO Optional: Maybe toggle colors?
+        loaderController.setColors();
+
+        // TODO Optional: Maybe toggle darken
+        loaderController.darkenPatchesOnMouseOver();
+    }
+
+    /**
+     * Starts the actual game
+     */
+    public void start(){
+
+        // Create the scene object
+        Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
+
+        // Add the scene to the stage
+        primaryStage.setScene(scene);
+
+        // Show the contents
+        primaryStage.show();
     }
 
     /**
@@ -45,6 +56,6 @@ public class MainController {
      * @param primaryStage primary stage
      */
     public void setPrimaryStage(Stage primaryStage){
-        this.primaryStage = Optional.of(primaryStage);
+        this.primaryStage = primaryStage;
     }
 }

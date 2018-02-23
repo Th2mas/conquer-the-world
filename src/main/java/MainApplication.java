@@ -1,9 +1,11 @@
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import ui.MainController;
+import util.error.ErrorDialog;
 import util.properties.PropertiesManager;
 
 import java.io.IOException;
@@ -33,8 +35,6 @@ public class MainApplication extends Application{
         primaryStage.setResizable(windowManager.getBoolean("window.resizable"));
 
         initRootLayout();
-
-        primaryStage.show();
     }
 
     /**
@@ -45,18 +45,14 @@ public class MainApplication extends Application{
             // Read the controller for this game
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(MainApplication.class.getResource("/fxml/MainApplication.fxml"));
-            AnchorPane rootLayout = loader.load();
-
-            // Show the scene containing the root layout.
-            Scene scene = new Scene(rootLayout);
-            primaryStage.setScene(scene);
-            primaryStage.show();
+            Group root = loader.load();
 
             MainController controller = loader.getController();
             controller.setPrimaryStage(primaryStage);
+            controller.start();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            ErrorDialog.showErrorDialog(e.getMessage());
         }
     }
 

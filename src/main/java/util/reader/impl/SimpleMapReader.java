@@ -150,8 +150,18 @@ public class SimpleMapReader implements MapReader {
             // Split the continent with its points and the countries
             String[] sp = line.split(" : ");
 
-            // Get the points
+            // Split for continent name and points
             String[] sp2 = sp[0].split(" ");
+
+            // Get the name
+            StringBuilder nameBuilder = new StringBuilder();
+            for(int i=0; i<sp2.length-1; i++)
+                nameBuilder.append(sp2[i]).append(" ");
+
+            // Remove the last space character
+            nameBuilder.deleteCharAt(nameBuilder.length()-1);
+
+            // Get the points
             int points = Integer.parseInt(sp2[sp2.length-1]);
 
             // Split the countries
@@ -164,7 +174,7 @@ public class SimpleMapReader implements MapReader {
             copyCountries.values().removeIf(notContainsCountry);
 
             // Add the countries to the continent
-            continentsList.add(new Continent(new ArrayList<>(copyCountries.values()), points));
+            continentsList.add(new Continent(new ArrayList<>(copyCountries.values()), points, nameBuilder.toString()));
         });
 
         return continentsList;
