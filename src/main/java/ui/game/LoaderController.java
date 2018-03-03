@@ -67,7 +67,7 @@ public class LoaderController {
                     color = new Color(1,0.9,0,1);
                     break;
                 case "South America":
-                    color = Color.RED;
+                    color = new Color(1,0.5,0,1);
                     break;
                 case "Europe":
                     color = Color.BLUE;

@@ -1,5 +1,7 @@
 package dto;
 
+import javafx.scene.paint.Color;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,10 +17,16 @@ public class Player {
     private List<Country> countryList;
 
     /**
-     * Creates a default player with an empty country list
+     * The player's color
+     */
+    private Color color;
+
+    /**
+     * Creates a default player with an empty country list and default color red
      */
     public Player(){
         this.countryList = new ArrayList<>();
+        this.color = Color.RED;
     }
 
     /**
@@ -52,5 +60,21 @@ public class Player {
      */
     public int sizeCountries(){
         return countryList.size();
+    }
+
+    /**
+     * Gets the player's color
+     * @return the player's color
+     */
+    public Color getColor() {
+        return color;
+    }
+
+    /**
+     * Sets the player's color
+     * @param color the new color
+     */
+    public void setColor(Color color) {
+        this.color = color;
     }
 }
