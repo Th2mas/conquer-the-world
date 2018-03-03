@@ -4,6 +4,8 @@ import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+import ui.game.GameController;
 import ui.game.LoaderController;
 
 /**
@@ -17,6 +19,7 @@ public class MainController {
     private Stage primaryStage;
 
     private LoaderController loaderController;
+    private GameController gameController;
 
     /**
      * The root group
@@ -27,13 +30,18 @@ public class MainController {
 
     @FXML
     public void initialize(){
+
+        // Load the game's content
         loaderController = new LoaderController(root);
 
         // TODO Optional: Maybe toggle colors?
         loaderController.setColors();
-
-        // TODO Optional: Maybe toggle darken
         loaderController.darkenPatchesOnMouseOver();
+
+        gameController = new GameController(loaderController.getContinentList());
+
+        // Start the game
+        gameController.start();
     }
 
     /**
@@ -46,6 +54,9 @@ public class MainController {
 
         // Add the scene to the stage
         primaryStage.setScene(scene);
+
+        // If the player wants to close the application -> shut the game down
+        primaryStage.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, e -> gameController.shutdown());
 
         // Show the contents
         primaryStage.show();
