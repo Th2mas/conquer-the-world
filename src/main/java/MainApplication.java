@@ -1,8 +1,6 @@
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.Node;
 import javafx.stage.Stage;
 import ui.MainController;
 import util.error.ErrorDialog;
@@ -45,7 +43,7 @@ public class MainApplication extends Application{
             // Read the controller for this game
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(MainApplication.class.getResource("/fxml/MainApplication.fxml"));
-            Group root = loader.load();
+            Node root = loader.load();
 
             MainController controller = loader.getController();
             controller.setPrimaryStage(primaryStage);

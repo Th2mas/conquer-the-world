@@ -1,5 +1,7 @@
 package dto;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
@@ -22,11 +24,17 @@ public class Player {
     private Color color;
 
     /**
+     * The player's armies
+     */
+    private IntegerProperty armies;
+
+    /**
      * Creates a default player with an empty country list and default color red
      */
     public Player(){
         this.countryList = new ArrayList<>();
         this.color = Color.RED;
+        this.armies = new SimpleIntegerProperty(0);
     }
 
     /**
@@ -76,5 +84,29 @@ public class Player {
      */
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    /**
+     * Returns the number of armies, the player currently has
+     * @return number of armies
+     */
+    public int getArmies() {
+        return armies.get();
+    }
+
+    /**
+     * Returns the armies property
+     * @return armies
+     */
+    public IntegerProperty armiesProperty() {
+        return armies;
+    }
+
+    /**
+     * Sets the current number of armies
+     * @param armies number to be set
+     */
+    public void setArmies(int armies) {
+        this.armies.set(armies);
     }
 }

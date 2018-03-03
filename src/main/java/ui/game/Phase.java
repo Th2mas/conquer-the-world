@@ -1,0 +1,8 @@
+package ui.game;
+
+public enum Phase {
+    ACQUISITION,
+    CONQUERING_ARMY_PLACEMENT,
+    CONQUERING_MOVE_AND_ATTACK,
+    CONQUERING_END_ROUND
+}

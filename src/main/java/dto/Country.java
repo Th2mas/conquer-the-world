@@ -25,7 +25,7 @@ public class Country {
     /**
      * The (x,y) coordinate of the country's capital
      */
-    private final Point2D capital;
+    private Point2D capital;
 
     /**
      * The country's neighbors (in string format)
@@ -84,6 +84,14 @@ public class Country {
      */
     public Point2D getCapital() {
         return capital;
+    }
+
+    /**
+     * Sets the coordinates of the country's capital
+     * @param capital the new position of the capital
+     */
+    public void setCapital(Point2D capital) {
+        this.capital = capital;
     }
 
     /**
