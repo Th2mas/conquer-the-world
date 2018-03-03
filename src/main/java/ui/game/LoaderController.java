@@ -1,6 +1,7 @@
 package ui.game;
 
 import dto.Continent;
+import dto.Country;
 import exceptions.IllegalCommandException;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
@@ -75,7 +76,15 @@ public class LoaderController {
      * This method darkens the color of the country on mouse over
      */
     public void darkenPatchesOnMouseOver(){
-        // TODO: Implement me!
+        continentList.ifPresent(continents -> continents.forEach(continent -> {
+            continent.getCountries().forEach(country -> {
+                // Get the current active patch, thus the current country
+                country.getPatches().forEach(patch -> {
+                    patch.setOnMouseEntered(e -> country.getPatches().forEach(p -> p.setFill(((Color)p.getFill()).darker())));
+                    patch.setOnMouseExited(e -> country.getPatches().forEach(p -> p.setFill(((Color)p.getFill()).brighter())));
+                });
+            });
+        }));
     }
 
     /**
