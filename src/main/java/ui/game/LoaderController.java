@@ -1,13 +1,16 @@
 package ui.game;
 
 import dto.Continent;
+import dto.Country;
 import exceptions.IllegalCommandException;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 import util.error.ErrorDialog;
 import util.reader.impl.SimpleMapReader;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +37,19 @@ public class LoaderController {
         try { continentList = Optional.of(new SimpleMapReader().readFile(LoaderController.class.getResource("/map/world.map").getPath())); }
         catch (IOException | IllegalCommandException e) { ErrorDialog.showErrorDialog(e.getMessage()); }
 
+        // Add lines, which connect the countries with their neighbors
+        continentList.ifPresent(continents -> continents.forEach(continent -> continent.getCountries().forEach(country -> {
+            List<Country> neighbors = new ArrayList<>();
+
+            // Get the country's neighbors
+            country.getNeighbors().forEach(neighbor -> continents.forEach(continent1 -> continent1.getCountries().forEach(country1 -> {
+                if(country1.getName().equalsIgnoreCase(neighbor)) neighbors.add(country1);
+            })));
+
+            // Draw the line between the country and the country's neighbors
+            neighbors.forEach(neighbor -> root.getChildren().add(new Line(country.getCapital().getX(), country.getCapital().getY(), neighbor.getCapital().getX(), neighbor.getCapital().getY())));
+        })));
+
         // Add all patches to the root group
         continentList.ifPresent(continents -> continents.forEach(continent -> continent.getCountries().forEach(country -> country.getPatches().forEach(patch -> root.getChildren().add(patch)))));
     }
@@ -51,7 +67,7 @@ public class LoaderController {
                     color = new Color(1,0.9,0,1);
                     break;
                 case "South America":
-                    color = Color.RED;
+                    color = new Color(1,0.5,0,1);
                     break;
                 case "Europe":
                     color = Color.BLUE;
@@ -75,7 +91,15 @@ public class LoaderController {
      * This method darkens the color of the country on mouse over
      */
     public void darkenPatchesOnMouseOver(){
-        // TODO: Implement me!
+        continentList.ifPresent(continents -> continents.forEach(continent -> {
+            continent.getCountries().forEach(country -> {
+                // Get the current active patch, thus the current country
+                country.getPatches().forEach(patch -> {
+                    patch.setOnMouseEntered(e -> country.getPatches().forEach(p -> p.setFill(((Color)p.getFill()).darker())));
+                    patch.setOnMouseExited(e -> country.getPatches().forEach(p -> p.setFill(((Color)p.getFill()).brighter())));
+                });
+            });
+        }));
     }
 
     /**
