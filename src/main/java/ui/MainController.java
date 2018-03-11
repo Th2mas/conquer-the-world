@@ -3,7 +3,6 @@ package ui;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import ui.game.GameController;
@@ -19,6 +18,9 @@ public class MainController {
      */
     private Stage primaryStage;
 
+    /**
+     * The controller, which handles the game logic
+     */
     private GameController gameController;
 
     /**
@@ -27,16 +29,21 @@ public class MainController {
     @FXML
     private Group group;
 
+    /**
+     * The pane, in which the main elements will be drawn
+     */
     @FXML
     private Pane root;
 
+    /**
+     * The pane in which all information will be displayed
+     */
     @FXML
-    private Label lbl_phase;
+    private Pane infoPane;
 
-    @FXML
-    private Label lbl_armies;
-
-
+    /**
+     * Initializes the necessities for the game
+     */
     @FXML
     public void initialize(){
 
@@ -47,7 +54,8 @@ public class MainController {
         loaderController.setColors();
         loaderController.darkenPatchesOnMouseOver();
 
-        gameController = new GameController(loaderController.getContinentList(), lbl_phase, lbl_armies);
+        // Create the new game controller
+        gameController = new GameController(loaderController.getContinentList(), group, infoPane);
 
         // Start the game
         gameController.start();

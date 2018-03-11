@@ -129,22 +129,6 @@ public class SimpleMapReader implements MapReader {
         // Create the countries
         names.forEach(name -> countries.put(name, new Country(name, patchesMap.get(name), capitalsMap.get(name))));
 
-        // Add the neighbors to the countries
-        neighborsStringList.forEach(line -> {
-            // Split the actual country from the neighbors
-            String[] sp = line.split(" : ");
-
-            // Split the neighbors
-            List<String> neighs;
-            if(sp[1].contains("-")) neighs = new ArrayList<>(Arrays.asList(sp[1].split(" - ")));
-            else neighs = new ArrayList<>(Collections.singletonList(sp[1]));
-
-            // Add the neighbors to the country
-            Country c = countries.get(sp[0]);
-            c.setNeighbors(neighs);
-            countries.put(sp[0], c);
-        });
-
         // Add the countries to their respective continent
         continentsStringList.forEach(line -> {
             // Split the continent with its points and the countries
@@ -176,6 +160,35 @@ public class SimpleMapReader implements MapReader {
             // Add the countries to the continent
             continentsList.add(new Continent(new ArrayList<>(copyCountries.values()), points, nameBuilder.toString()));
         });
+
+        // Add the neighbors
+        neighborsStringList.forEach(line -> {
+            // Split the actual country from the neighbors
+            String[] sp = line.split(" : ");
+
+            // Split the neighbors
+            List<String> neighs;
+            if(sp[1].contains("-")) neighs = new ArrayList<>(Arrays.asList(sp[1].split(" - ")));
+            else neighs = new ArrayList<>(Collections.singletonList(sp[1]));
+
+            // Get the actual neighbors
+            List<Country> neighbors = new ArrayList<>();
+
+            continentsList.forEach(continent -> continent.getCountries().forEach(country -> {
+                neighs.forEach(neigh -> {
+                    if(country.getName().equalsIgnoreCase(neigh)) neighbors.add(country);
+                });
+            }));
+            Country c = countries.get(sp[0]);
+            c.setNeighbors(neighbors);
+            countries.put(sp[0], c);
+
+        });
+
+        // Complete the missing neighbors (the .map file does not always have all correct neighbors)
+        continentsList.forEach(continent -> continent.getCountries().forEach(country -> country.getNeighbors().forEach(neighbor -> {
+            if(!neighbor.getNeighbors().contains(country)) neighbor.getNeighbors().add(country);
+        })));
 
         return continentsList;
     }

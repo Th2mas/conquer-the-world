@@ -1,5 +1,8 @@
 package ui.game;
 
+/**
+ * Indicates in which phase the game is currently in
+ */
 public enum Phase {
     ACQUISITION,
     CONQUERING_ARMY_PLACEMENT,
