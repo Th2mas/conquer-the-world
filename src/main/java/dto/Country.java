@@ -25,12 +25,12 @@ public class Country {
     /**
      * The (x,y) coordinate of the country's capital
      */
-    private final Point2D capital;
+    private Point2D capital;
 
     /**
      * The country's neighbors (in string format)
      */
-    private List<String> neighbors;
+    private List<Country> neighbors;
 
     /**
      * Creates a new country without any neighbors
@@ -50,7 +50,7 @@ public class Country {
      * @param capital the country's capital in (x,y) coordinates
      * @param neighbors the country's neighbors
      */
-    public Country(String name, List<Polygon> patches, Point2D capital, List<String> neighbors) {
+    private Country(String name, List<Polygon> patches, Point2D capital, List<Country> neighbors) {
         Objects.requireNonNull(name);
         Objects.requireNonNull(patches);
         Objects.requireNonNull(capital);
@@ -87,19 +87,28 @@ public class Country {
     }
 
     /**
-     * Sets the country's neighbors
-     * @param neighbors the neighbors to be set
+     * Sets the coordinates of the country's capital
+     * @param capital the new position of the capital
      */
-    public void setNeighbors(List<String> neighbors) {
-        this.neighbors = neighbors;
+    public void setCapital(Point2D capital) {
+        this.capital = capital;
     }
+
 
     /**
      * Gets the country's neighbors
      * @return neighbors
      */
-    public List<String> getNeighbors() {
+    public List<Country> getNeighbors() {
         return neighbors;
+    }
+
+    /**
+     * Sets the country's neighbors
+     * @param neighbors the neighbors to be set
+     */
+    public void setNeighbors(List<Country> neighbors) {
+        this.neighbors = neighbors;
     }
 
     @Override
@@ -109,22 +118,30 @@ public class Country {
         Country country = (Country) o;
         return Objects.equals(name, country.name) &&
                 Objects.equals(patches, country.patches) &&
-                Objects.equals(capital, country.capital) &&
-                Objects.equals(neighbors, country.neighbors);
+                Objects.equals(capital, country.capital);
+                //&&
+                //Objects.equals(neighbors, country.neighbors);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, patches, capital, neighbors);
+        return Objects.hash(name, patches, capital);//, neighbors); -> recursive call...
     }
 
     @Override
     public String toString() {
+
+        /*
+        StringBuilder neighborsBuilder = new StringBuilder();
+        neighbors.forEach(neighbor -> neighborsBuilder.append(neighbor.getName()).append(","));
+        neighborsBuilder.deleteCharAt(neighborsBuilder.length()-1);
+        */
+
         return "Country{" +
                 "name='" + name + '\'' +
                 ", patches=" + patches +
                 ", capital=" + capital +
-                ", neighbors=" + neighbors +
+                //", neighbors=[" + neighborsBuilder.toString() + "]" +
                 '}';
     }
 }

@@ -48,7 +48,7 @@ public class PropertiesManager {
      * @return the requested boolean
      */
     public boolean getBoolean(String key){
-        return Boolean.valueOf(key);
+        return Boolean.parseBoolean(bundle.getString(key));
     }
 
     /**

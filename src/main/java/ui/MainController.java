@@ -3,8 +3,8 @@ package ui;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import ui.game.GameController;
 import ui.game.LoaderController;
 
@@ -18,27 +18,44 @@ public class MainController {
      */
     private Stage primaryStage;
 
-    private LoaderController loaderController;
+    /**
+     * The controller, which handles the game logic
+     */
     private GameController gameController;
 
     /**
-     * The root group
+     * The container for the polygons
      */
     @FXML
-    private Group root;
+    private Group group;
 
+    /**
+     * The pane, in which the main elements will be drawn
+     */
+    @FXML
+    private Pane root;
 
+    /**
+     * The pane in which all information will be displayed
+     */
+    @FXML
+    private Pane infoPane;
+
+    /**
+     * Initializes the necessities for the game
+     */
     @FXML
     public void initialize(){
 
         // Load the game's content
-        loaderController = new LoaderController(root);
+        LoaderController loaderController = new LoaderController(group);
 
         // TODO Optional: Maybe toggle colors?
         loaderController.setColors();
         loaderController.darkenPatchesOnMouseOver();
 
-        gameController = new GameController(loaderController.getContinentList());
+        // Create the new game controller
+        gameController = new GameController(loaderController.getContinentList(), group, infoPane);
 
         // Start the game
         gameController.start();
@@ -50,13 +67,10 @@ public class MainController {
     public void start(){
 
         // Create the scene object
-        Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
+        Scene scene = new Scene(root);
 
         // Add the scene to the stage
         primaryStage.setScene(scene);
-
-        // If the player wants to close the application -> shut the game down
-        primaryStage.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, e -> gameController.shutdown());
 
         // Show the contents
         primaryStage.show();

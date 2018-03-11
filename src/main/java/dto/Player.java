@@ -1,9 +1,13 @@
 package dto;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A representation for the player
@@ -12,9 +16,9 @@ import java.util.List;
 public class Player {
 
     /**
-     * The player's country list
+     * The player's country map -> stores the country and the amount of armies
      */
-    private List<Country> countryList;
+    private Map<Country, Integer> countryMap;
 
     /**
      * The player's color
@@ -22,19 +26,25 @@ public class Player {
     private Color color;
 
     /**
+     * The player's armies
+     */
+    private IntegerProperty armies;
+
+    /**
      * Creates a default player with an empty country list and default color red
      */
     public Player(){
-        this.countryList = new ArrayList<>();
+        this.countryMap = new HashMap<>();
         this.color = Color.RED;
+        this.armies = new SimpleIntegerProperty(0);
     }
 
     /**
-     * Adds the given country to the country list
+     * Adds the given country to the country list and sets the number of armies for that country to 1
      * @param c {@link Country} to be added
      */
     public void addCountry(Country c){
-        countryList.add(c);
+        countryMap.put(c, 1);
     }
 
     /**
@@ -42,7 +52,15 @@ public class Player {
      * @param c {@link Country} to be removed
      */
     public void removeCountry(Country c){
-        countryList.remove(c);
+        countryMap.remove(c);
+    }
+
+    /**
+     * Returns a list with all countries the player currently has
+     * @return the country list
+     */
+    public List<Country> getCountries(){
+        return new ArrayList<>(countryMap.keySet());
     }
 
     /**
@@ -51,7 +69,7 @@ public class Player {
      * @return true, if the player has the country; otherwise false
      */
     public boolean hasCountry(Country c){
-        return countryList.contains(c);
+        return countryMap.containsKey(c);
     }
 
     /**
@@ -59,7 +77,7 @@ public class Player {
      * @return the number of elements in the country list
      */
     public int sizeCountries(){
-        return countryList.size();
+        return countryMap.size();
     }
 
     /**
@@ -76,5 +94,50 @@ public class Player {
      */
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    /**
+     * Returns the number of armies, the player currently has
+     * @return number of armies
+     */
+    public int getArmies() {
+        return armies.get();
+    }
+
+    /**
+     * Returns the armies property
+     * @return armies
+     */
+    public IntegerProperty armiesProperty() {
+        return armies;
+    }
+
+    /**
+     * Sets the current number of armies
+     * @param armies number to be set
+     */
+    public void setArmies(int armies) {
+        this.armies.set(armies);
+    }
+
+    /**
+     * Increments the number of armies for the given country, if the player has the given country
+     * Decrements the number of total armies, if the player has the given country
+     * @param c indicates which {@link Country} counter should be incremented
+     */
+    public void placeArmies(Country c){
+        if(hasCountry(c) && getArmies() > 0){
+            countryMap.put(c, (countryMap.get(c)+1));
+            armies.set(armies.get()-1);
+        }
+    }
+
+    /**
+     * Returns the number of armies for the given country
+     * @param c the country to be checked
+     * @return the number of armies for {@link Country} c
+     */
+    public int getArmies(Country c){
+        return countryMap.getOrDefault(c, 0);
     }
 }

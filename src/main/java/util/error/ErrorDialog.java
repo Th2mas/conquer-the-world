@@ -7,6 +7,7 @@ import javafx.scene.control.Alert;
  */
 public class ErrorDialog {
 
+    // static class
     private ErrorDialog(){}
 
     /**
@@ -15,6 +16,7 @@ public class ErrorDialog {
      */
     public static void showErrorDialog(String errorText){
         Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setResizable(true);
         alert.setContentText(errorText);
         alert.show();
     }
