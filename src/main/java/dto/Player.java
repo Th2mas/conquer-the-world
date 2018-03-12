@@ -121,6 +121,19 @@ public class Player {
     }
 
     /**
+     * Sets the number of armies for the given country
+     * @param c the {@link Country} for which the number of armies should be set
+     * @param armies the number of armies to be set
+     */
+    public void setArmies(Country c, int armies){
+        if(hasCountry(c)) {
+            int oldValue = countryMap.get(c);
+            countryMap.put(c, armies);
+            this.armies.set(this.armies.get()-oldValue+armies);
+        }
+    }
+
+    /**
      * Increments the number of armies for the given country, if the player has the given country
      * Decrements the number of total armies, if the player has the given country
      * @param c indicates which {@link Country} counter should be incremented

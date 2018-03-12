@@ -111,6 +111,15 @@ public class Country {
         this.neighbors = neighbors;
     }
 
+    /**
+     * Checks if the given country is a neighbor
+     * @param c country to be checked, if it is a neighbor
+     * @return true, if it is a neighbor; otherwise false
+     */
+    public boolean hasNeighbor(Country c){
+        return neighbors.contains(c);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -119,8 +128,6 @@ public class Country {
         return Objects.equals(name, country.name) &&
                 Objects.equals(patches, country.patches) &&
                 Objects.equals(capital, country.capital);
-                //&&
-                //Objects.equals(neighbors, country.neighbors);
     }
 
     @Override

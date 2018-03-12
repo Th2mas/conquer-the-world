@@ -8,6 +8,8 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -65,6 +67,9 @@ public class GameController {
      * Contains the elements, which will be drawn on the info pane
      */
     private final Pane infoPane;
+
+    private Country startCountry;
+    private boolean drag = false;
 
     /**
      * The constructor for the game controller, which handles the actual game logic
@@ -130,9 +135,11 @@ public class GameController {
         continentList.forEach(continent -> continent.getCountries().forEach(country -> {
 
             country.getPatches().forEach(patch -> {
+
                 // CLICKED
-                patch.setOnMouseClicked(e -> {
+                patch.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
                     switch (currentPhase){
+
                         // Click during acquisition phase
                         case ACQUISITION:
                             // Check if the country is not assigned
@@ -167,12 +174,14 @@ public class GameController {
                                 setArmies(player);
                                 armiesProperty.set("Armies: " + player.getArmies());
 
-                                setArmies(ai);
+                                //TODO: Do the random adding as soon as the player has finished his round
+                                // setArmies(ai);
                             }
                             break;
 
                         // Click during army placement phase
                         case CONQUERING_ARMY_PLACEMENT:
+
                             // Increment the counter of the armies of the clicked country, if the player has the country
                             // and has enough armies to place
                             player.placeArmies(country);
@@ -187,16 +196,50 @@ public class GameController {
 
                             // Check if the phase switches to 'CONQUERING_MOVE_AND_ATTACK'
                             if(player.getArmies()==0) setPhase(Phase.CONQUERING_MOVE_AND_ATTACK);
-
                             break;
                     }
                 });
 
-                // DRAGGED
-                patch.setOnMouseDragged(e -> {
+                // DRAG DETECTED
+                patch.addEventHandler(MouseEvent.DRAG_DETECTED, e -> {
                     switch (currentPhase){
                         case CONQUERING_MOVE_AND_ATTACK:
-                            // TODO: Implement this functionality on dragged
+                            // Save the starting country
+                            if(player.hasCountry(country)) startCountry = country;
+                            drag = true;
+                            break;
+                    }
+                });
+
+                // ENTERED
+                patch.addEventHandler(MouseEvent.MOUSE_ENTERED, e -> {
+                    switch (currentPhase) {
+                        case CONQUERING_MOVE_AND_ATTACK:
+
+                            // TODO: Remove dragging bug: when you drag and stay in your country, the dragging
+                            // is still on and you can move to another country and the armies will move too
+
+                            // Check, if 'dragging' is on and the country is a neighbor
+                            if(drag && startCountry != null && startCountry.hasNeighbor(country)){
+                                // Attack a hostile country, if it is in the country's surrounding
+                                if(!player.hasCountry(country)){
+                                    System.out.println("ENEMY!");
+                                    // TODO: Implement attacking
+                                }
+
+                                // Move the armies, if you have dragged into your country
+                                // Leave min. one army in the country
+                                // TODO: Let the player decide how many armies he wants to move
+                                else if(player.getArmies(startCountry) > 1){
+                                    System.out.println("MOVE!");
+                                    int armies = player.getArmies(startCountry)-1;
+                                    player.setArmies(startCountry, 1);
+                                    player.setArmies(country, player.getArmies(country)+armies);
+                                }
+                            }
+
+                            showArmies();
+                            drag = false;
                             break;
                     }
                 });
