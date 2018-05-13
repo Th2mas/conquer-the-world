@@ -153,4 +153,13 @@ public class Player {
     public int getArmies(Country c){
         return countryMap.getOrDefault(c, 0);
     }
+
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder("Player{");
+        for(Country c : countryMap.keySet()) s.append(c.getName()).append("=").append(getArmies(c)).append(",");
+        s.deleteCharAt(s.length()-1);
+        s.append("}");
+        return s.toString();
+    }
 }
