@@ -8,6 +8,8 @@ import javafx.scene.shape.Polygon;
 import ui.game.GameController;
 import ui.game.phase.Phase;
 
+import java.util.Random;
+
 /**
  * The move and attack phase
  */
@@ -58,14 +60,15 @@ public class MoveAndAttackPhase implements Phase {
             for(Continent continent : gameController.getContinentList()) for(Country c : continent.getCountries()) for(Polygon polygon : c.getPatches()) if(polygon.contains(event.getX(), event.getY())) releasedCountry = c;
             // Check if we have selected a country and if it is in our range
             if(releasedCountry != null && country.hasNeighbor(releasedCountry)) {
-                // Check if the releasedCountry is an enemy
+
+                // Check if the country on which the mouse was released is an enemy
                 if(gameController.getAi().hasCountry(releasedCountry)){
                     // Attack the country
-                    // TODO: Implement attacking
+                    gameController.attack(gameController.getPlayer(), gameController.getAi(), gameController.getSelectedCountry(), releasedCountry);
                 }
                 // Otherwise it is our own and we can move our troops
                 else {
-                    // TODO: Let the player decide how many armies he wants to move
+                    // TODO Optional: Let the player decide how many armies he wants to move
 
                     if(gameController.getPlayer().getArmies(country) > 1){
                         int amount = gameController.getPlayer().getArmies(country)-1;
