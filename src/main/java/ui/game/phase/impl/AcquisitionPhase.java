@@ -2,6 +2,7 @@ package ui.game.phase.impl;
 
 import dto.Continent;
 import dto.Country;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import ui.game.GameController;
 import ui.game.phase.Phase;
@@ -64,6 +65,11 @@ public class AcquisitionPhase implements Phase {
     @Override
     public void dragDrop(MouseEvent event, Country country) {
         // TODO: Implement 'dragDrop' in " + AcquisitionPhase.class.getName());
+
+    }
+
+    @Override
+    public void setOnKeyPressed(KeyEvent event) {
 
     }
 

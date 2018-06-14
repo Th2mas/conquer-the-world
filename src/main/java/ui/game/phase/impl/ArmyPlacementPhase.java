@@ -1,6 +1,7 @@
 package ui.game.phase.impl;
 
 import dto.Country;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import ui.game.GameController;
 import ui.game.phase.Phase;
@@ -14,7 +15,7 @@ public class ArmyPlacementPhase implements Phase {
 
     private GameController gameController;
 
-    public ArmyPlacementPhase(GameController gameController) {
+    ArmyPlacementPhase(GameController gameController) {
         this.gameController = gameController;
     }
 
@@ -44,6 +45,11 @@ public class ArmyPlacementPhase implements Phase {
     @Override
     public void dragDrop(MouseEvent event, Country country) {
         //TODO: Implement 'dragDrop' in " + ArmyPlacementPhase.class.getName());
+    }
+
+    @Override
+    public void setOnKeyPressed(KeyEvent event) {
+
     }
 
     @Override

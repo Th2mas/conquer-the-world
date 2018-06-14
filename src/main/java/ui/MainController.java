@@ -69,6 +69,8 @@ public class MainController {
         // Create the scene object
         Scene scene = new Scene(root);
 
+        gameController.setOnKeyPressed(scene);
+
         // Add the scene to the stage
         primaryStage.setScene(scene);
 

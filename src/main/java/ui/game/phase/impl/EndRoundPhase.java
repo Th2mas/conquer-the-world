@@ -1,6 +1,7 @@
 package ui.game.phase.impl;
 
 import dto.Country;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import ui.game.GameController;
 import ui.game.phase.Phase;
@@ -12,7 +13,7 @@ public class EndRoundPhase implements Phase {
 
     private GameController gameController;
 
-    public EndRoundPhase(GameController gameController) {
+    EndRoundPhase(GameController gameController) {
         this.gameController = gameController;
     }
 
@@ -29,6 +30,11 @@ public class EndRoundPhase implements Phase {
     @Override
     public void dragDrop(MouseEvent event, Country country) {
         //TODO: Implement 'dragDrop' in " + EndRoundPhase.class.getName());
+    }
+
+    @Override
+    public void setOnKeyPressed(KeyEvent event) {
+
     }
 
     @Override

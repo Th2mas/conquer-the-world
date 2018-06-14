@@ -7,6 +7,7 @@ import exceptions.NodeNotFoundException;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Group;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -124,7 +125,10 @@ public class GameController {
 
         // Bind the number of armies to the armies label
         armiesProperty = new SimpleStringProperty("Armies: " + "0");
-        player.armiesProperty().addListener(((observable, oldValue, newValue) -> armiesProperty.set("Armies: " + newValue)));
+        player.armiesProperty().addListener(((observable, oldValue, newValue) -> {
+            System.out.println("Old armies: " + oldValue + ", new armies: " + newValue);
+            armiesProperty.set("Armies: " + newValue);
+        }));
 
         // Get the labels and add bind their text properties to the phase property
         try {
@@ -330,5 +334,14 @@ public class GameController {
         p2.setArmies(defendCountry, p2.getArmies(defendCountry)+defendArmies);
 
         return false;
+    }
+
+    /**
+     * Delegates key events to the current phase
+     * @param scene the Scene object for registering the key
+     */
+    public void setOnKeyPressed(Scene scene){
+        // Define what will happen on key pressed
+        scene.setOnKeyPressed(event -> currentPhase.setOnKeyPressed(event));
     }
 }

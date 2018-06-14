@@ -2,13 +2,12 @@ package ui.game.phase.impl;
 
 import dto.Continent;
 import dto.Country;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import ui.game.GameController;
 import ui.game.phase.Phase;
-
-import java.util.Random;
 
 /**
  * The move and attack phase
@@ -18,7 +17,7 @@ public class MoveAndAttackPhase implements Phase {
     private GameController gameController;
     private boolean drag;
 
-    public MoveAndAttackPhase(GameController gameController) {
+    MoveAndAttackPhase(GameController gameController) {
         this.gameController = gameController;
         drag = false;
     }
@@ -79,6 +78,18 @@ public class MoveAndAttackPhase implements Phase {
             }
         }
         gameController.showArmies();
+    }
+
+    @Override
+    public void setOnKeyPressed(KeyEvent event) {
+
+        switch(event.getText().toLowerCase()){
+            case "e":
+                gameController.setPhase(new EndRoundPhase(gameController));
+                break;
+            default:
+                break;
+        }
     }
 
     @Override

@@ -1,6 +1,7 @@
 package ui.game.phase;
 
 import dto.Country;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 
 /**
@@ -26,4 +27,10 @@ public interface Phase {
      *                // TODO: Test this JAVADOC
      */
     void dragDrop(MouseEvent event, Country country);
+
+    /**
+     * Defines what will on a keyPressed
+     * @param event
+     */
+    void setOnKeyPressed(KeyEvent event);
 }
