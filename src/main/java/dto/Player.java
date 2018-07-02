@@ -11,7 +11,6 @@ import java.util.Map;
 
 /**
  * A representation for the player
- * TODO Later: Move the CRUD methods to a service and store it in a database (or file) -> needed for saving the game
  */
 public class Player {
 
@@ -31,13 +30,22 @@ public class Player {
     private IntegerProperty armies;
 
     /**
-     * Creates a default player with an empty country list and default color red
+     * The player's name
      */
-    public Player(){
-        this.countryMap = new HashMap<>();
-        this.color = Color.RED;
-        this.armies = new SimpleIntegerProperty(0);
-    }
+    private String name;
+
+    /**
+     * Indicates, if the player is a real player, or not
+     */
+    private boolean ai;
+
+    /**
+     * Indicates, if the player can move
+     */
+    private boolean move;
+
+    // Don't let the programmer create a plain player object
+    private Player(){}
 
     /**
      * Adds the given country to the country list and sets the number of armies for that country to 1
@@ -97,6 +105,22 @@ public class Player {
     }
 
     /**
+     * Returns the player's name
+     * @return the player's name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Sets the player's name
+     * @param name the new name
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
      * Returns the number of armies, the player currently has
      * @return number of armies
      */
@@ -146,6 +170,30 @@ public class Player {
     }
 
     /**
+     * Checks, if the player is a real person or not
+     * @return true, if player is controlled by a computer; false, if the player is a real person
+     */
+    public boolean isAi() {
+        return ai;
+    }
+
+    public void setCountryMap(Map<Country, Integer> countryMap) {
+        this.countryMap = countryMap;
+    }
+
+    public void setAi(boolean ai) {
+        this.ai = ai;
+    }
+
+    public boolean canBeMoved() {
+        return move;
+    }
+
+    public void setMove(boolean move) {
+        this.move = move;
+    }
+
+    /**
      * Returns the number of armies for the given country
      * @param c the country to be checked
      * @return the number of armies for {@link Country} c
@@ -156,10 +204,71 @@ public class Player {
 
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("Player{");
+        StringBuilder s = new StringBuilder("Player: " + name + "=[");
         for(Country c : countryMap.keySet()) s.append(c.getName()).append("=").append(getArmies(c)).append(",");
-        s.deleteCharAt(s.length()-1);
-        s.append("}");
+        if(s.charAt(s.length()-1) == ',') s.deleteCharAt(s.length()-1);
+        s.append("]");
         return s.toString();
+    }
+
+    /**
+     * A simple builder for a player
+     */
+    public static final class PlayerBuilder {
+        private Map<Country, Integer> countryMap;
+
+        private Color color;
+
+        private int armies;
+
+        private String name;
+
+        private boolean ai;
+
+        private boolean move;
+
+        public PlayerBuilder name(String name){
+            this.name = name;
+            return this;
+        }
+
+        public PlayerBuilder armies(int armies){
+            this.armies = armies;
+            return this;
+        }
+
+        public PlayerBuilder color(Color color){
+            this.color = color;
+            return this;
+        }
+
+        public PlayerBuilder ai(boolean ai){
+            this.ai = ai;
+            return this;
+        }
+
+        public PlayerBuilder countryMap(Map<Country, Integer> countryMap){
+            this.countryMap = countryMap;
+            return this;
+        }
+
+        public PlayerBuilder move(boolean move){
+            this.move = move;
+            return this;
+        }
+
+        public Player build(){
+            Player player = new Player();
+            player.armies = new SimpleIntegerProperty();
+
+            player.setName(name);
+            player.setArmies(armies);
+            player.setColor(color);
+            player.setAi(ai);
+            player.setCountryMap(countryMap);
+            player.setMove(move);
+
+            return player;
+        }
     }
 }

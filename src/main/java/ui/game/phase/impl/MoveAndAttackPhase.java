@@ -2,6 +2,9 @@ package ui.game.phase.impl;
 
 import dto.Continent;
 import dto.Country;
+import dto.Player;
+import exceptions.AttackOwnCountryException;
+import exceptions.NotEnoughArmiesException;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -25,9 +28,10 @@ public class MoveAndAttackPhase implements Phase {
     @Override
     public void click(Country country) {
 
-        // Check if the player has the country and enough armies -> make it 'glow', if the player wants to use that country for attacking
+        // Check if the player has the country and enough armies
+        // TODO make it 'glow', if the player wants to use that country for attacking
         // TODO Optional: Alternating color effect
-        if(gameController.getPlayer().hasCountry(country)){
+        if(gameController.getPlayerService().getCurrentPlayer().hasCountry(country)){
 
             // Check if there is a selected country
             if(gameController.getSelectedCountry() == null) {
@@ -60,19 +64,21 @@ public class MoveAndAttackPhase implements Phase {
             // Check if we have selected a country and if it is in our range
             if(releasedCountry != null && country.hasNeighbor(releasedCountry)) {
 
-                // Check if the country on which the mouse was released is an enemy
-                if(gameController.getAi().hasCountry(releasedCountry)){
-                    // Attack the country
-                    gameController.attack(gameController.getPlayer(), gameController.getAi(), gameController.getSelectedCountry(), releasedCountry);
-                }
-                // Otherwise it is our own and we can move our troops
-                else {
+                Player currentPlayer = gameController.getPlayerService().getCurrentPlayer();
+
+                // Attack the country
+                try {
+                    gameController.getPlayerService().attack(currentPlayer, gameController.getSelectedCountry(), releasedCountry);
+                } catch (NotEnoughArmiesException e) {
+                    // Do nothing, if there are not enough armies
+                } catch (AttackOwnCountryException e) {
+                    // The attacking country is our own country, so we can move the armies
                     // TODO Optional: Let the player decide how many armies he wants to move
 
-                    if(gameController.getPlayer().getArmies(country) > 1){
-                        int amount = gameController.getPlayer().getArmies(country)-1;
-                        gameController.getPlayer().setArmies(country, 1);
-                        gameController.getPlayer().setArmies(releasedCountry, gameController.getPlayer().getArmies(releasedCountry)+amount);
+                    if(currentPlayer.getArmies(country) > 1){
+                        int amount = currentPlayer.getArmies(country)-1;
+                        currentPlayer.setArmies(country, 1);
+                        currentPlayer.setArmies(releasedCountry, currentPlayer.getArmies(releasedCountry)+amount);
                     }
                 }
             }

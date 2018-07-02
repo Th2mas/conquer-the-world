@@ -43,7 +43,7 @@ public class MainApplication extends Application{
             // Read the controller for this game
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(MainApplication.class.getResource("/fxml/MainApplication.fxml"));
-            Node root = loader.load();
+            loader.load();
 
             MainController controller = loader.getController();
             controller.setPrimaryStage(primaryStage);

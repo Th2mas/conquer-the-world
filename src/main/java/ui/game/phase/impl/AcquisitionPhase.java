@@ -2,8 +2,10 @@ package ui.game.phase.impl;
 
 import dto.Continent;
 import dto.Country;
+import dto.Player;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.shape.Polygon;
 import ui.game.GameController;
 import ui.game.phase.Phase;
 
@@ -20,40 +22,54 @@ public class AcquisitionPhase implements Phase {
 
     @Override
     public void click(Country country) {
-        // Check if the country is not assigned
-        if(!gameController.getAi().hasCountry(country) && !gameController.getPlayer().hasCountry(country)) {
-            // Add the country to the player and change its color
-            gameController.getPlayer().addCountry(country);
-            country.getPatches().forEach(polygon -> polygon.setFill(gameController.getPlayer().getColor()));
 
-            // Add a random country of a random continent to the ai
+        Player currentPlayer = gameController.getPlayerService().getCurrentPlayer();
+
+        // Check if the country is not assigned
+        if(gameController.getPlayerService().isCountryFree(country)) {
+            // Add the country to the player and change its color
+            currentPlayer.addCountry(country);
+            for(Polygon p : country.getPatches()) p.setFill(currentPlayer.getColor());
+        }
+
+        // Move and check if the next player is a real person. If it is a bot, then just add randomly a country
+        gameController.getPlayerService().move();
+
+        // If the next player is a bot, then just assign a random country to it
+        currentPlayer = gameController.getPlayerService().getCurrentPlayer();
+
+        while(currentPlayer.isAi()){
             Country randomCountry = null;
             while(randomCountry == null){
                 Continent randomContinent = gameController.getContinentList().get((int)(Math.random()*gameController.getContinentList().size()));
                 Country test = randomContinent.getCountries().get((int)(Math.random()*randomContinent.getCountries().size()));
-                if(!gameController.getAi().hasCountry(test) && !gameController.getPlayer().hasCountry(test)) randomCountry = test;
+
+                if(gameController.getPlayerService().isCountryFree(test))
+                    randomCountry = test;
             }
 
-            gameController.getAi().addCountry(randomCountry);
-            randomCountry.getPatches().forEach(polygon -> polygon.setFill(gameController.getAi().getColor()));
+            currentPlayer.addCountry(randomCountry);
+            for(Polygon p : randomCountry.getPatches()) p.setFill(currentPlayer.getColor());
+
+            gameController.getPlayerService().move();
+            currentPlayer = gameController.getPlayerService().getCurrentPlayer();
         }
 
         // Check if all countries are assigned to a player
-        int sumCountries = 0;
-        for(Continent cont : gameController.getContinentList()) sumCountries += cont.getCountries().size();
+        int sumCountries = gameController.getContinentList().stream().mapToInt(cont -> cont.getCountries().size()).sum();
+
+        // Calculate the total number of conquered countries
+        int sizes = gameController.getPlayerService().getPlayers().stream().mapToInt(Player::sizeCountries).sum();
 
         // Check if the phase switches to 'CONQUERING_ARMY_PLACEMENT'
-        if(sumCountries == (gameController.getAi().sizeCountries()+gameController.getPlayer().sizeCountries())) {
+        if(sumCountries == sizes) {
             gameController.setPhase(new ArmyPlacementPhase(gameController));
             // TODO: Set another text for the phaseproperty -> read it from a specific language properties file
             // TODO: Do the same for armiesproperty
 
             // Set the armies for the player
-            gameController.setArmies(gameController.getPlayer());
-            gameController.showArmiesForPlayer(gameController.getPlayer());
-
-            //TODO: Do the random adding as soon as the player has finished his round
-            // gameController.setArmies(ai);
+            gameController.setArmies(currentPlayer);
+            gameController.showArmiesForPlayer(currentPlayer);
         }
     }
 

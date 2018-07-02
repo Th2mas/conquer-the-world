@@ -12,8 +12,11 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import service.PlayerService;
+import service.impl.SimplePlayerService;
 import ui.game.phase.Phase;
 import ui.game.phase.impl.AcquisitionPhase;
+import ui.game.phase.impl.ArmyPlacementPhase;
 import util.GuiUtil;
 
 import java.util.*;
@@ -27,13 +30,13 @@ public class GameController {
      * Defines how many armies can attack a country at once
      * TODO: Move me to a properties file and load it afterwards
      */
-    private static final int MAX_ATTACK_ARMIES = 3;
+    public static final int MAX_ATTACK_ARMIES = 3;
 
     /**
      * Tells how many armies can defend a country at once
      * TODO: Move me to a properties file and load it afterwards
      */
-    private static final int MAX_DEFENDING_ARMIES = 2;
+    public static final int MAX_DEFENDING_ARMIES = 2;
 
     /**
      * Contains all continents
@@ -51,14 +54,9 @@ public class GameController {
     private Phase currentPhase;
 
     /**
-     * Stores all properties for the human player
+     * The service for handling actions on players
      */
-    private final Player player;
-
-    /**
-     * Stores all properties for the ai player
-     */
-    private final Player ai;
+    private final PlayerService playerService;
 
     /**
      * The property, which notifies all listener, if the phase was changed
@@ -83,7 +81,6 @@ public class GameController {
     // Sets the selected country
     private Country selectedCountry;
 
-
     /**
      * The constructor for the game controller, which handles the actual game logic
      * @param continentList the list with all continents
@@ -100,6 +97,9 @@ public class GameController {
         this.currentPhase = new AcquisitionPhase(this);
         this.capitalMap = new HashMap<>();
 
+        // Set a new player service
+        playerService = new SimplePlayerService();
+
         // Create the capital text objects and put them into the map
         continentList.forEach(continent -> continent.getCountries().forEach(country -> {
             Text text = new Text(country.getCapital().getX(), country.getCapital().getY(), "");
@@ -114,20 +114,25 @@ public class GameController {
 
         // TODO Later: Request the player's name and color
         // Create the player
-        player = new Player();
+        Player player = playerService.createPlayer("Player", false);
+        player.setMove(true);
 
-        // Create the oponent
-        ai = new Player();
+        // Create the oponents
+        Player ai = playerService.createPlayer("Ai1", true);
         ai.setColor(Color.GREY);
+
 
         // Bind the phase to the phase label
         phaseProperty = new SimpleStringProperty("Phase: " + currentPhase);
 
         // Bind the number of armies to the armies label
-        armiesProperty = new SimpleStringProperty("Armies: " + "0");
+        armiesProperty = new SimpleStringProperty("Armies: " + 0);
         player.armiesProperty().addListener(((observable, oldValue, newValue) -> {
             System.out.println("Old armies: " + oldValue + ", new armies: " + newValue);
-            armiesProperty.set("Armies: " + newValue);
+            // TODO: Fix the player.armiesProperty() bug
+            if(currentPhase.getClass() == ArmyPlacementPhase.class)
+                armiesProperty.set("Armies: " + newValue);
+            else armiesProperty.set("Armies: " + 0);
         }));
 
         // Get the labels and add bind their text properties to the phase property
@@ -168,6 +173,12 @@ public class GameController {
             // Show the armies, if currentPhase != ACQUISITION TODO: Change the hardcoded string
             if(!newValue.equalsIgnoreCase("Acquisition"))
                 showArmies();
+            // If the end round starts -> let the next player play
+            System.out.println(newValue);
+            if(newValue.equalsIgnoreCase("End round")) {
+                playerService.move();
+                setPhase(new ArmyPlacementPhase(this));
+            }
         }));
     }
 
@@ -196,22 +207,6 @@ public class GameController {
         // Divide by three, so you get the total number of armies you can place
         totalArmies /= 3;
         player.setArmies(totalArmies);
-    }
-
-    /**
-     * Returns the human player object
-     * @return the player
-     */
-    public Player getPlayer() {
-        return player;
-    }
-
-    /**
-     * Returns the ai player object
-     * @return the opponent
-     */
-    public Player getAi() {
-        return ai;
     }
 
     /**
@@ -247,14 +242,23 @@ public class GameController {
     }
 
     /**
+     * Returns the gamecontroller's playerservice
+     * @return {@link PlayerService}
+     */
+    public PlayerService getPlayerService() {
+        return playerService;
+    }
+
+    /**
      * Draws all armies for every player (in black)
      */
     public void showArmies(){
         continentList.forEach(continent -> continent.getCountries().forEach(country -> {
             Text text = capitalMap.get(country);
 
-            if(player.hasCountry(country)) text.setText(player.getArmies(country)+"");
-            else text.setText(ai.getArmies(country)+"");
+            playerService.getPlayers().forEach(player -> {
+                if(player.hasCountry(country)) text.setText(player.getArmies(country)+"");
+            });
 
             text.setVisible(true);
         }));
@@ -267,73 +271,6 @@ public class GameController {
     public void setPhase(Phase phase){
         currentPhase = phase;
         phaseProperty.set("Phase: " + phase);
-    }
-
-    /**
-     * This method lets player1 attack player2
-     * @param p1 the attacking player
-     * @param p2 the defending player
-     * @return true, if the country was conquered by player1
-     * TODO: Should this method really be standing here, or better as an object method in a PlayerService class?
-     */
-    public boolean attack(Player p1, Player p2, Country attackCountry, Country defendCountry){
-
-        Objects.requireNonNull(p1);
-        Objects.requireNonNull(p2);
-        Objects.requireNonNull(attackCountry);
-        Objects.requireNonNull(defendCountry);
-
-        // If the player has not enough armies in the attacking country, then nothing should happen
-        if(p1.getArmies(attackCountry) == 1) return false;
-
-        // If the attacking country has n armies, you can attack only attack with at most n-1 armies
-        int attackingArmies;
-        int defendArmies;
-
-        // Decide how many armies can attack the opponent
-        attackingArmies = (p1.getArmies(attackCountry) <= MAX_ATTACK_ARMIES) ? p1.getArmies(attackCountry)-1 : MAX_ATTACK_ARMIES;
-        p1.setArmies(attackCountry, p1.getArmies(attackCountry)-attackingArmies);
-
-        // Decide how many armies can defend the attacked country
-        defendArmies = (p2.getArmies(defendCountry) <= MAX_DEFENDING_ARMIES) ? p2.getArmies(defendCountry) : MAX_DEFENDING_ARMIES;
-        p2.setArmies(defendCountry, p2.getArmies(defendCountry)-defendArmies);
-
-        // To save the thrown dices, we need to use an array
-        Integer[] attackDices = new Integer[attackingArmies];
-        Integer[] defendDices = new Integer[defendArmies];
-
-        // Calculate the thrown dices
-        for(int i=0; i<attackDices.length; i++) attackDices[i] = (int) (Math.random()*6)+1;
-        for(int i=0; i<defendDices.length; i++) defendDices[i] = (int) (Math.random()*6)+1;
-
-        // Sort the dice arrays in decscending order to compare the first elements
-        Arrays.sort(attackDices, Collections.reverseOrder());
-        Arrays.sort(defendDices, Collections.reverseOrder());
-
-        // Check which army has the highest number per dice
-        for(int i=0; i<defendDices.length; i++){
-            System.out.println("Attack=[" + attackCountry.getName() + "," + attackDices[i] + "], Defend=[" + defendCountry.getName() + "," + defendDices[i] + "]");
-            // If the attacking player has a larger number, the number of defending armies should be decremented
-            if(attackDices[i] > defendDices[i]) defendArmies--;
-            else attackingArmies--;
-        }
-
-        // If the country was conquered, remove it from the defending players list and add it to the attacking players list
-        if(defendArmies == 0){
-            p2.removeCountry(defendCountry);
-            p1.addCountry(defendCountry);
-            p1.setArmies(defendCountry, attackingArmies);
-
-            // Change the defendCountry's color
-            defendCountry.getPatches().forEach(polygon -> polygon.setFill(p1.getColor()));
-            return true;
-        }
-
-        // If there are still some armies left, you have to return them to their respective countries
-        p1.setArmies(attackCountry, p1.getArmies(attackCountry)+attackingArmies);
-        p2.setArmies(defendCountry, p2.getArmies(defendCountry)+defendArmies);
-
-        return false;
     }
 
     /**
