@@ -25,15 +25,18 @@ public class AcquisitionPhase implements Phase {
 
         Player currentPlayer = gameController.getPlayerService().getCurrentPlayer();
 
+
         // Check if the country is not assigned
         if(gameController.getPlayerService().isCountryFree(country)) {
             // Add the country to the player and change its color
             currentPlayer.addCountry(country);
             for(Polygon p : country.getPatches()) p.setFill(currentPlayer.getColor());
         }
+        // Else the player has clicked on a conquered country: then just return
+        else return;
 
         // Move and check if the next player is a real person. If it is a bot, then just add randomly a country
-        gameController.getPlayerService().move();
+        gameController.getPlayerService().nextTurn();
 
         // If the next player is a bot, then just assign a random country to it
         currentPlayer = gameController.getPlayerService().getCurrentPlayer();
@@ -51,7 +54,7 @@ public class AcquisitionPhase implements Phase {
             currentPlayer.addCountry(randomCountry);
             for(Polygon p : randomCountry.getPatches()) p.setFill(currentPlayer.getColor());
 
-            gameController.getPlayerService().move();
+            gameController.getPlayerService().nextTurn();
             currentPlayer = gameController.getPlayerService().getCurrentPlayer();
         }
 
@@ -69,7 +72,8 @@ public class AcquisitionPhase implements Phase {
 
             // Set the armies for the player
             gameController.setArmies(currentPlayer);
-            gameController.showArmiesForPlayer(currentPlayer);
+            gameController.showArmiesLabel(currentPlayer);
+            gameController.showArmiesOnCountries();
         }
     }
 

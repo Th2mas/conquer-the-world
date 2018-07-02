@@ -42,10 +42,10 @@ public interface PlayerService {
     void addCountry(Player player, Country country) throws CountryNotAvailableException;
 
     /**
-     * Moves the armies to a country, which belongs the player or does attack the
-     * @param player
-     * @param from
-     * @param to
+     * Moves all armies from 'from' to 'to', if both belong to the player
+     * @param player the player
+     * @param from the country from which the armies should be moved
+     * @param to the country to which the armies should be moved
      */
     void moveArmies(Player player, Country from, Country to);
 
@@ -59,7 +59,7 @@ public interface PlayerService {
     /**
      * Indicates the end of one players turn and lets the next player play
      */
-    void move();
+    void nextTurn();
 
     /**
      * Checks, if the given country belongs to a player

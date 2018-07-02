@@ -30,7 +30,7 @@ public class MoveAndAttackPhase implements Phase {
 
         // Check if the player has the country and enough armies
         // TODO make it 'glow', if the player wants to use that country for attacking
-        // TODO Optional: Alternating color effect
+        /*
         if(gameController.getPlayerService().getCurrentPlayer().hasCountry(country)){
 
             // Check if there is a selected country
@@ -46,6 +46,7 @@ public class MoveAndAttackPhase implements Phase {
                 gameController.selectCountry(country);
             }
         }
+        */
     }
 
     @Override
@@ -60,7 +61,12 @@ public class MoveAndAttackPhase implements Phase {
         if(drag) {
             // Get the country at the current mouse location
             Country releasedCountry = null;
-            for(Continent continent : gameController.getContinentList()) for(Country c : continent.getCountries()) for(Polygon polygon : c.getPatches()) if(polygon.contains(event.getX(), event.getY())) releasedCountry = c;
+            for(Continent continent : gameController.getContinentList())
+                for(Country c : continent.getCountries())
+                    for(Polygon polygon : c.getPatches())
+                        if(polygon.contains(event.getX(), event.getY()))
+                            releasedCountry = c;
+
             // Check if we have selected a country and if it is in our range
             if(releasedCountry != null && country.hasNeighbor(releasedCountry)) {
 
@@ -72,18 +78,14 @@ public class MoveAndAttackPhase implements Phase {
                 } catch (NotEnoughArmiesException e) {
                     // Do nothing, if there are not enough armies
                 } catch (AttackOwnCountryException e) {
+
                     // The attacking country is our own country, so we can move the armies
                     // TODO Optional: Let the player decide how many armies he wants to move
-
-                    if(currentPlayer.getArmies(country) > 1){
-                        int amount = currentPlayer.getArmies(country)-1;
-                        currentPlayer.setArmies(country, 1);
-                        currentPlayer.setArmies(releasedCountry, currentPlayer.getArmies(releasedCountry)+amount);
-                    }
+                    gameController.getPlayerService().moveArmies(currentPlayer, country, releasedCountry);
                 }
             }
         }
-        gameController.showArmies();
+        gameController.showArmiesOnCountries();
     }
 
     @Override

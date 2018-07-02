@@ -5,7 +5,6 @@ import dto.Player;
 import exceptions.AttackOwnCountryException;
 import exceptions.CountryNotAvailableException;
 import exceptions.NotEnoughArmiesException;
-import exceptions.NotImplementedException;
 import javafx.scene.paint.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +59,18 @@ public class SimplePlayerService implements PlayerService {
 
     @Override
     public void moveArmies(Player player, Country from, Country to) {
-        throw new NotImplementedException();
+
+        Objects.requireNonNull(player);
+        Objects.requireNonNull(from);
+        Objects.requireNonNull(to);
+
+        if(player.hasCountry(from) && player.hasCountry(to)){
+            int armies = player.getArmies(from);
+            if(armies > 1){
+                player.setArmies(to, player.getArmies(to)+(armies-1));
+                player.setArmies(from, 1);
+            }
+        }
     }
 
     @Override
@@ -81,7 +91,9 @@ public class SimplePlayerService implements PlayerService {
         int defendArmies;
 
         // Decide how many armies can attack the opponent
-        attackingArmies = (p1.getArmies(attackCountry) <= MAX_ATTACK_ARMIES) ? p1.getArmies(attackCountry)-1 : MAX_ATTACK_ARMIES;
+        attackingArmies = (p1.getArmies(attackCountry) <= MAX_ATTACK_ARMIES && p1.getArmies(attackCountry) > 1)
+                ? p1.getArmies(attackCountry)-1
+                : MAX_ATTACK_ARMIES;
         p1.setArmies(attackCountry, p1.getArmies(attackCountry)-attackingArmies);
 
         // Get the player, who owns the country
@@ -89,11 +101,16 @@ public class SimplePlayerService implements PlayerService {
         for(Player player : players) if(player.hasCountry(defendCountry)) op = Optional.of(player);
 
         // If there is no player who owns the country -> illegal state
-        if(!op.isPresent()) throw new IllegalStateException("No player owns country " + defendCountry.getName());
+        if(!op.isPresent()) {
+            // Reset the previous made changes
+            p1.setArmies(attackCountry, p1.getArmies(attackCountry)+attackingArmies);
+
+            // throw exception
+            throw new IllegalStateException("No player owns country " + defendCountry.getName());
+        }
         Player p2 = op.get();
 
         // Decide how many armies can defend the attacked country
-
         defendArmies = (p2.getArmies(defendCountry) <= MAX_DEFENDING_ARMIES) ? p2.getArmies(defendCountry) : MAX_DEFENDING_ARMIES;
         p2.setArmies(defendCountry, p2.getArmies(defendCountry)-defendArmies);
 
@@ -111,10 +128,12 @@ public class SimplePlayerService implements PlayerService {
 
         // Check which army has the highest number per dice
         for(int i=0; i<defendDices.length; i++){
-            System.out.println("Attack=[" + attackCountry.getName() + "," + attackDices[i] + "], Defend=[" + defendCountry.getName() + "," + defendDices[i] + "]");
+            LOG.info("Attack=[" + attackCountry.getName() + "," + attackDices[i] + "], Defend=[" + defendCountry.getName() + "," + defendDices[i] + "]");
             // If the attacking player has a larger number, the number of defending armies should be decremented
             if(attackDices[i] > defendDices[i]) defendArmies--;
             else attackingArmies--;
+
+            if(defendArmies == 0 || attackingArmies == 0) break;
         }
 
         // If the country was conquered, remove it from the defending players list and add it to the attacking players list
@@ -134,7 +153,7 @@ public class SimplePlayerService implements PlayerService {
     }
 
     @Override
-    public void move() {
+    public void nextTurn() {
         int index = -1;
         Player currentPlayer = getCurrentPlayer();
         for(int i=0; i<players.size(); i++) if(players.get(i).equals(currentPlayer)) index = i;

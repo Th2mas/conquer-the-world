@@ -129,10 +129,7 @@ public class GameController {
         armiesProperty = new SimpleStringProperty("Armies: " + 0);
         player.armiesProperty().addListener(((observable, oldValue, newValue) -> {
             System.out.println("Old armies: " + oldValue + ", new armies: " + newValue);
-            // TODO: Fix the player.armiesProperty() bug
-            if(currentPhase.getClass() == ArmyPlacementPhase.class)
-                armiesProperty.set("Armies: " + newValue);
-            else armiesProperty.set("Armies: " + 0);
+            armiesProperty.set("Armies: " + newValue);
         }));
 
         // Get the labels and add bind their text properties to the phase property
@@ -170,14 +167,27 @@ public class GameController {
 
         // Specify what will happen, if the phase changes
         phaseProperty.addListener(((observable, oldValue, newValue) -> {
-            // Show the armies, if currentPhase != ACQUISITION TODO: Change the hardcoded string
-            if(!newValue.equalsIgnoreCase("Acquisition"))
-                showArmies();
+
             // If the end round starts -> let the next player play
-            System.out.println(newValue);
-            if(newValue.equalsIgnoreCase("End round")) {
-                playerService.move();
+            if(newValue.equalsIgnoreCase("Phase: End round")) {
+                playerService.nextTurn();
                 setPhase(new ArmyPlacementPhase(this));
+
+                Player currentPlayer = getPlayerService().getCurrentPlayer();
+
+                // Define actions for the ai
+                while(currentPlayer.isAi()){
+
+                    // Let the ai click during army placement
+                    while(currentPhase.getClass() == ArmyPlacementPhase.class) {
+                        Country randomCountry = currentPlayer.getCountries().get((int) (Math.random() * currentPlayer.getCountries().size()));
+                        currentPhase.click(randomCountry);
+                    }
+
+
+                    playerService.nextTurn();
+                    currentPlayer = getPlayerService().getCurrentPlayer();
+                }
             }
         }));
     }
@@ -213,7 +223,7 @@ public class GameController {
      * Shows armies for the player on the screen
      * @param player the player which is used to display army information
      */
-    public void showArmiesForPlayer(Player player){
+    public void showArmiesLabel(Player player){
         armiesProperty.set("Armies: " + player.getArmies());
     }
 
@@ -252,7 +262,7 @@ public class GameController {
     /**
      * Draws all armies for every player (in black)
      */
-    public void showArmies(){
+    public void showArmiesOnCountries(){
         continentList.forEach(continent -> continent.getCountries().forEach(country -> {
             Text text = capitalMap.get(country);
 

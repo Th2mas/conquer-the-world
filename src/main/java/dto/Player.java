@@ -151,9 +151,8 @@ public class Player {
      */
     public void setArmies(Country c, int armies){
         if(hasCountry(c)) {
-            int oldValue = countryMap.get(c);
             countryMap.put(c, armies);
-            this.armies.set(this.armies.get()-oldValue+armies);
+            setArmies(getArmies()-getArmies(c)+armies);
         }
     }
 
