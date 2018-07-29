@@ -4,7 +4,6 @@ import dto.Continent;
 import dto.Country;
 import dto.Player;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Polygon;
 import ui.game.GameController;
 import ui.game.phase.Phase;
@@ -54,6 +53,8 @@ public class AcquisitionPhase implements Phase {
             currentPlayer.addCountry(randomCountry);
             for(Polygon p : randomCountry.getPatches()) p.setFill(currentPlayer.getColor());
 
+            gameController.setArmies(currentPlayer);
+
             gameController.getPlayerService().nextTurn();
             currentPlayer = gameController.getPlayerService().getCurrentPlayer();
         }
@@ -74,6 +75,8 @@ public class AcquisitionPhase implements Phase {
             gameController.setArmies(currentPlayer);
             gameController.showArmiesLabel(currentPlayer);
             gameController.showArmiesOnCountries();
+
+
         }
     }
 
@@ -83,7 +86,7 @@ public class AcquisitionPhase implements Phase {
     }
 
     @Override
-    public void dragDrop(MouseEvent event, Country country) {
+    public void dragDrop(double x, double y, Country country) {
         // TODO: Implement 'dragDrop' in " + AcquisitionPhase.class.getName());
 
     }

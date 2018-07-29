@@ -17,6 +17,8 @@ import service.impl.SimplePlayerService;
 import ui.game.phase.Phase;
 import ui.game.phase.impl.AcquisitionPhase;
 import ui.game.phase.impl.ArmyPlacementPhase;
+import ui.game.phase.impl.EndRoundPhase;
+import ui.game.phase.impl.MoveAndAttackPhase;
 import util.GuiUtil;
 
 import java.util.*;
@@ -159,35 +161,37 @@ public class GameController {
 
                 // DRAGGED
                 patch.setOnDragDetected(event -> currentPhase.dragDetect(country));
-                patch.setOnMouseReleased(event -> currentPhase.dragDrop(event, country));
+                patch.setOnMouseReleased(event -> currentPhase.dragDrop(event.getX(), event.getY(), country));
 
             });
-
         }));
 
         // Specify what will happen, if the phase changes
         phaseProperty.addListener(((observable, oldValue, newValue) -> {
 
-            // If the end round starts -> let the next player play
-            if(newValue.equalsIgnoreCase("Phase: End round")) {
-                playerService.nextTurn();
-                setPhase(new ArmyPlacementPhase(this));
+            Player currentPlayer = playerService.getCurrentPlayer();
+            System.out.println("Current Player: " + currentPlayer.getName());
 
-                Player currentPlayer = getPlayerService().getCurrentPlayer();
-
-                // Define actions for the ai
-                while(currentPlayer.isAi()){
-
-                    // Let the ai click during army placement
-                    while(currentPhase.getClass() == ArmyPlacementPhase.class) {
-                        Country randomCountry = currentPlayer.getCountries().get((int) (Math.random() * currentPlayer.getCountries().size()));
-                        currentPhase.click(randomCountry);
-                    }
-
-
-                    playerService.nextTurn();
-                    currentPlayer = getPlayerService().getCurrentPlayer();
+            if(currentPlayer.isAi()){
+                while(currentPhase.getClass() == ArmyPlacementPhase.class){
+                    Country randomCountry = currentPlayer.getCountries().get((int) (Math.random() * currentPlayer.getCountries().size()));
+                    currentPhase.click(randomCountry);
                 }
+                if(currentPhase.getClass() == MoveAndAttackPhase.class){
+                    List<Country> countries = currentPlayer.getCountries();
+                    for(Country country : countries){
+                        currentPhase.dragDetect(country);
+                        for(Country neighbor : country.getNeighbors()){
+                            currentPhase.dragDrop(neighbor.getCapital().getX(), neighbor.getCapital().getY(), country);
+                        }
+                    }
+                    new EndRoundPhase(this);
+                    // TODO: Fix next round phase (some stack trace...)
+                }
+            }
+
+            if(currentPlayer.getCountries().size() == capitalMap.keySet().size()){
+                System.out.println("Player " + currentPlayer.getName() + " has won!");
             }
         }));
     }

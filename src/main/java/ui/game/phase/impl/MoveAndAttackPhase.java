@@ -56,7 +56,7 @@ public class MoveAndAttackPhase implements Phase {
     }
 
     @Override
-    public void dragDrop(MouseEvent event, Country country) {
+    public void dragDrop(double x, double y, Country country) {
         // Only if drag==true, we have an actual drag
         if(drag) {
             // Get the country at the current mouse location
@@ -64,7 +64,7 @@ public class MoveAndAttackPhase implements Phase {
             for(Continent continent : gameController.getContinentList())
                 for(Country c : continent.getCountries())
                     for(Polygon polygon : c.getPatches())
-                        if(polygon.contains(event.getX(), event.getY()))
+                        if(polygon.contains(x, y))
                             releasedCountry = c;
 
             // Check if we have selected a country and if it is in our range
@@ -93,7 +93,7 @@ public class MoveAndAttackPhase implements Phase {
 
         switch(event.getText().toLowerCase()){
             case "e":
-                gameController.setPhase(new EndRoundPhase(gameController));
+                new EndRoundPhase(gameController);
                 break;
             default:
                 break;

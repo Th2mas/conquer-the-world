@@ -26,7 +26,7 @@ public interface Phase {
      * @param country should be the country, that was used as the RELEASE happened
      *                // TODO: Test this JAVADOC
      */
-    void dragDrop(MouseEvent event, Country country);
+    void dragDrop(double x, double y, Country country);
 
     /**
      * Defines what will on a keyPressed

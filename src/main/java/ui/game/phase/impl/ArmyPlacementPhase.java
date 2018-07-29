@@ -41,7 +41,7 @@ public class ArmyPlacementPhase implements Phase {
     }
 
     @Override
-    public void dragDrop(MouseEvent event, Country country) {
+    public void dragDrop(double x, double y, Country country) {
         //TODO: Implement 'dragDrop' in " + ArmyPlacementPhase.class.getName());
     }
 

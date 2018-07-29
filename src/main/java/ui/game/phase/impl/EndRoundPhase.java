@@ -13,8 +13,10 @@ public class EndRoundPhase implements Phase {
 
     private GameController gameController;
 
-    EndRoundPhase(GameController gameController) {
+    public EndRoundPhase(GameController gameController) {
         this.gameController = gameController;
+        gameController.getPlayerService().nextTurn();
+        gameController.setPhase(new ArmyPlacementPhase(gameController));
     }
 
     @Override
@@ -28,7 +30,7 @@ public class EndRoundPhase implements Phase {
     }
 
     @Override
-    public void dragDrop(MouseEvent event, Country country) {
+    public void dragDrop(double x, double y, Country country) {
         //TODO: Implement 'dragDrop' in " + EndRoundPhase.class.getName());
     }
 
