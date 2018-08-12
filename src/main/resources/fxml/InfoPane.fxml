@@ -12,13 +12,6 @@
           fx:controller="ui.game.InformationController"
           fx:id="informationPane"
 >
-    <columnConstraints>
-        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-    </columnConstraints>
-    <rowConstraints>
-        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-    </rowConstraints>
     <Label fx:id="lbl_armies" alignment="CENTER" contentDisplay="CENTER" />
     <Label fx:id="lbl_phase" alignment="CENTER" contentDisplay="CENTER" GridPane.columnIndex="1" />
 </GridPane>

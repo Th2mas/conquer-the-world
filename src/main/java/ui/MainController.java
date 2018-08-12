@@ -2,12 +2,11 @@ package ui;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import ui.game.GameController;
-import ui.game.LoaderController;
 import util.properties.PropertiesManager;
 
 import java.io.IOException;
@@ -28,6 +27,12 @@ public class MainController {
      */
     @FXML
     public Pane center;
+
+    /**
+     * The main pane, which will contain all elements
+     */
+    @FXML
+    public AnchorPane mainPane;
 
     /**
      * The optional primary stage for closing the stage on close request
@@ -54,17 +59,7 @@ public class MainController {
      */
     private PropertiesManager settingsManager;
 
-    /**
-     * The container for the polygons
-     */
-    @FXML
-    private Group group;
 
-    /**
-     * The pane, in which the main elements will be drawn
-     */
-    @FXML
-    private Pane root;
 
     /**
      * Initializes the necessities for the game
@@ -93,7 +88,7 @@ public class MainController {
     public void start(){
 
         // Create the scene object
-        Scene scene = new Scene(root);
+        Scene scene = new Scene(mainPane);
 
         gameController.setOnKeyPressed(scene);
 

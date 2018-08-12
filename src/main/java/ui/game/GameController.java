@@ -10,6 +10,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -42,10 +43,17 @@ public class GameController {
     private Map<Country, Text> capitalMap;
 
     @FXML
-    public Pane gamePane;
+    public BorderPane gamePane;
 
     @FXML
     public Pane gameBottom;
+
+
+    /**
+     * A container for the game group
+     */
+    @FXML
+    public Pane gameContainer;
 
     @FXML
     public Group gameGroup;
@@ -139,6 +147,8 @@ public class GameController {
         initInformationPane();
 
         // Get the labels and add bind their text properties to the phase property
+        gamePane.setCenter(gameContainer);
+        gamePane.setBottom(gameBottom);
         gameBottom.getChildren().add(informationController.getView());
         informationController.armiesTextProperty().bindBidirectional(armiesProperty);
         informationController.phaseTextProperty().bindBidirectional(phaseProperty);

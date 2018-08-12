@@ -46,6 +46,7 @@ public class MenuController {
 
         ObservableList<String> languages = FXCollections.observableArrayList();
 
+
         langManager.getSupportedLocales().forEach(locale -> {
             // Map the languages manually
             // TODO: Isn't there a way to do that automatically?
@@ -65,7 +66,10 @@ public class MenuController {
             }
         });
 
-        languageChooser.getItems().addAll(languages);
+        languageChooser.setPromptText(langManager.getString("Language.PromptText"));
+
+        languageChooser.setItems(languages);
+        languageChooser.setValue(languageChooser.getItems().get(0));
     }
 
     public Parent getView(){
