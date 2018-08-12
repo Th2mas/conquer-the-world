@@ -16,4 +16,6 @@ public class SimpleContinentService implements ContinentService {
     public List<Continent> getContinents() throws IllegalCommandException, IOException {
         return new SimpleMapReader().readFile(SimpleContinentService.class.getResource("/map/world.map").getPath());
     }
+
+
 }

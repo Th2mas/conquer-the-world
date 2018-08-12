@@ -7,11 +7,18 @@ import exceptions.NodeNotFoundException;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Group;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import service.PlayerService;
+import service.impl.SimplePlayerService;
+import ui.game.phase.Phase;
+import ui.game.phase.impl.AcquisitionPhase;
+import ui.game.phase.impl.ArmyPlacementPhase;
+import ui.game.phase.impl.EndRoundPhase;
+import ui.game.phase.impl.MoveAndAttackPhase;
 import util.GuiUtil;
 
 import java.util.*;
@@ -20,6 +27,18 @@ import java.util.*;
  * The controller, which handles the actual game logic
  */
 public class GameController {
+
+    /**
+     * Defines how many armies can attack a country at once
+     * TODO: Move me to a properties file and load it afterwards
+     */
+    public static final int MAX_ATTACK_ARMIES = 3;
+
+    /**
+     * Tells how many armies can defend a country at once
+     * TODO: Move me to a properties file and load it afterwards
+     */
+    public static final int MAX_DEFENDING_ARMIES = 2;
 
     /**
      * Contains all continents
@@ -37,14 +56,9 @@ public class GameController {
     private Phase currentPhase;
 
     /**
-     * Stores all properties for the human player
+     * The service for handling actions on players
      */
-    private final Player player;
-
-    /**
-     * Stores all properties for the ai player
-     */
-    private final Player ai;
+    private final PlayerService playerService;
 
     /**
      * The property, which notifies all listener, if the phase was changed
@@ -66,6 +80,9 @@ public class GameController {
      */
     private final Pane infoPane;
 
+    // Sets the selected country
+    private Country selectedCountry;
+
     /**
      * The constructor for the game controller, which handles the actual game logic
      * @param continentList the list with all continents
@@ -79,8 +96,11 @@ public class GameController {
         Objects.requireNonNull(infoPane);
 
         this.continentList = continentList;
-        this.currentPhase = Phase.ACQUISITION;
+        this.currentPhase = new AcquisitionPhase(this);
         this.capitalMap = new HashMap<>();
+
+        // Set a new player service
+        playerService = new SimplePlayerService();
 
         // Create the capital text objects and put them into the map
         continentList.forEach(continent -> continent.getCountries().forEach(country -> {
@@ -96,18 +116,23 @@ public class GameController {
 
         // TODO Later: Request the player's name and color
         // Create the player
-        player = new Player();
+        Player player = playerService.createPlayer("Player", false);
+        player.setMove(true);
 
-        // Create the oponent
-        ai = new Player();
+        // Create the oponents
+        Player ai = playerService.createPlayer("Ai1", true);
         ai.setColor(Color.GREY);
 
+
         // Bind the phase to the phase label
-        phaseProperty = new SimpleStringProperty("Phase: " + Phase.ACQUISITION);
+        phaseProperty = new SimpleStringProperty("Phase: " + currentPhase);
 
         // Bind the number of armies to the armies label
-        armiesProperty = new SimpleStringProperty("Armies: " + "0");
-        player.armiesProperty().addListener(((observable, oldValue, newValue) -> armiesProperty.set("Armies: " + newValue)));
+        armiesProperty = new SimpleStringProperty("Armies: " + 0);
+        player.armiesProperty().addListener(((observable, oldValue, newValue) -> {
+            System.out.println("Old armies: " + oldValue + ", new armies: " + newValue);
+            armiesProperty.set("Armies: " + newValue);
+        }));
 
         // Get the labels and add bind their text properties to the phase property
         try {
@@ -130,85 +155,44 @@ public class GameController {
         continentList.forEach(continent -> continent.getCountries().forEach(country -> {
 
             country.getPatches().forEach(patch -> {
+
                 // CLICKED
-                patch.setOnMouseClicked(e -> {
-                    switch (currentPhase){
-                        // Click during acquisition phase
-                        case ACQUISITION:
-                            // Check if the country is not assigned
-                            if(!ai.hasCountry(country) && !player.hasCountry(country)) {
-                                // Add the country to the player and change its color
-                                player.addCountry(country);
-                                country.getPatches().forEach(polygon -> polygon.setFill(player.getColor()));
-
-                                // Add a random country of a random continent to the ai
-                                Country randomCountry = null;
-                                while(randomCountry == null){
-                                    Continent randomContinent = continentList.get((int)(Math.random()*continentList.size()));
-                                    Country test = randomContinent.getCountries().get((int)(Math.random()*randomContinent.getCountries().size()));
-                                    if(!ai.hasCountry(test) && !player.hasCountry(test)) randomCountry = test;
-                                }
-
-                                ai.addCountry(randomCountry);
-                                randomCountry.getPatches().forEach(polygon -> polygon.setFill(ai.getColor()));
-                            }
-
-                            // Check if all countries are assigned to a player
-                            int sumCountries = 0;
-                            for(Continent cont : continentList) sumCountries += cont.getCountries().size();
-
-                            // Check if the phase switches to 'CONQUERING_ARMY_PLACEMENT'
-                            if(sumCountries == (ai.sizeCountries()+player.sizeCountries())) {
-                                setPhase(Phase.CONQUERING_ARMY_PLACEMENT);
-                                // TODO: Set another text for the phaseproperty -> read it from a specific language properties file
-                                // TODO: Do the same for armiesproperty
-
-                                // Set the armies for the player
-                                setArmies(player);
-                                armiesProperty.set("Armies: " + player.getArmies());
-
-                                setArmies(ai);
-                            }
-                            break;
-
-                        // Click during army placement phase
-                        case CONQUERING_ARMY_PLACEMENT:
-                            // Increment the counter of the armies of the clicked country, if the player has the country
-                            // and has enough armies to place
-                            player.placeArmies(country);
-                            armiesProperty.set("Armies: " + player.getArmies());
-
-                            // Set an army randomly for the ai
-                            Country random = ai.getCountries().get(new Random().nextInt(ai.getCountries().size()));
-                            ai.placeArmies(random);
-
-                            // Show the newly placed armies
-                            showArmies();
-
-                            // Check if the phase switches to 'CONQUERING_MOVE_AND_ATTACK'
-                            if(player.getArmies()==0) setPhase(Phase.CONQUERING_MOVE_AND_ATTACK);
-
-                            break;
-                    }
-                });
+                patch.setOnMouseClicked(event -> currentPhase.click(country));
 
                 // DRAGGED
-                patch.setOnMouseDragged(e -> {
-                    switch (currentPhase){
-                        case CONQUERING_MOVE_AND_ATTACK:
-                            // TODO: Implement this functionality on dragged
-                            break;
-                    }
-                });
-            });
+                patch.setOnDragDetected(event -> currentPhase.dragDetect(country));
+                patch.setOnMouseReleased(event -> currentPhase.dragDrop(event.getX(), event.getY(), country));
 
+            });
         }));
 
         // Specify what will happen, if the phase changes
         phaseProperty.addListener(((observable, oldValue, newValue) -> {
-            // Show the armies, if currentPhase != ACQUISITION
-            if(!newValue.equalsIgnoreCase(Phase.ACQUISITION.toString()))
-                showArmies();
+
+            Player currentPlayer = playerService.getCurrentPlayer();
+            System.out.println("Current Player: " + currentPlayer.getName());
+
+            if(currentPlayer.isAi()){
+                while(currentPhase.getClass() == ArmyPlacementPhase.class){
+                    Country randomCountry = currentPlayer.getCountries().get((int) (Math.random() * currentPlayer.getCountries().size()));
+                    currentPhase.click(randomCountry);
+                }
+                if(currentPhase.getClass() == MoveAndAttackPhase.class){
+                    List<Country> countries = currentPlayer.getCountries();
+                    for(Country country : countries){
+                        currentPhase.dragDetect(country);
+                        for(Country neighbor : country.getNeighbors()){
+                            currentPhase.dragDrop(neighbor.getCapital().getX(), neighbor.getCapital().getY(), country);
+                        }
+                    }
+                    new EndRoundPhase(this);
+                    // TODO: Fix next round phase (some stack trace...)
+                }
+            }
+
+            if(currentPlayer.getCountries().size() == capitalMap.keySet().size()){
+                System.out.println("Player " + currentPlayer.getName() + " has won!");
+            }
         }));
     }
 
@@ -229,7 +213,7 @@ public class GameController {
      * Sets the armies for the given player
      * @param player the player for whom the number of armies needs to be calculated
      */
-    private void setArmies(Player player){
+    public void setArmies(Player player){
         // Set the total number of armies the players have
         int totalArmies = player.sizeCountries();
         for(Continent con : continentList) if(hasContinent(player, con)) totalArmies+=con.getPoints();
@@ -240,14 +224,55 @@ public class GameController {
     }
 
     /**
+     * Shows armies for the player on the screen
+     * @param player the player which is used to display army information
+     */
+    public void showArmiesLabel(Player player){
+        armiesProperty.set("Armies: " + player.getArmies());
+    }
+
+    /**
+     * Returns the list with continents
+     * @return continentList
+     */
+    public List<Continent> getContinentList() {
+        return continentList;
+    }
+
+    /**
+     * Selects a country for dragging
+     * @param country Country for dragging
+     */
+    public void selectCountry(Country country){
+        this.selectedCountry = country;
+    }
+
+    /**
+     * Returns the country, which was selected for dragging
+     * @return country
+     */
+    public Country getSelectedCountry() {
+        return selectedCountry;
+    }
+
+    /**
+     * Returns the gamecontroller's playerservice
+     * @return {@link PlayerService}
+     */
+    public PlayerService getPlayerService() {
+        return playerService;
+    }
+
+    /**
      * Draws all armies for every player (in black)
      */
-    private void showArmies(){
+    public void showArmiesOnCountries(){
         continentList.forEach(continent -> continent.getCountries().forEach(country -> {
             Text text = capitalMap.get(country);
 
-            if(player.hasCountry(country)) text.setText(player.getArmies(country)+"");
-            else text.setText(ai.getArmies(country)+"");
+            playerService.getPlayers().forEach(player -> {
+                if(player.hasCountry(country)) text.setText(player.getArmies(country)+"");
+            });
 
             text.setVisible(true);
         }));
@@ -257,8 +282,17 @@ public class GameController {
      * Sets the given phase and modifies the ui
      * @param phase current phase
      */
-    private void setPhase(Phase phase){
+    public void setPhase(Phase phase){
         currentPhase = phase;
-        phaseProperty.set("Phase: " + currentPhase);
+        phaseProperty.set("Phase: " + phase);
+    }
+
+    /**
+     * Delegates key events to the current phase
+     * @param scene the Scene object for registering the key
+     */
+    public void setOnKeyPressed(Scene scene){
+        // Define what will happen on key pressed
+        scene.setOnKeyPressed(event -> currentPhase.setOnKeyPressed(event));
     }
 }
