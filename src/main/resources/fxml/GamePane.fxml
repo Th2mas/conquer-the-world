@@ -3,17 +3,19 @@
 <?import javafx.scene.Group?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Separator?>
 <VBox
-        stylesheets="@/css/gamePane.css"
         xmlns="http://javafx.com/javafx/9"
         xmlns:fx="http://javafx.com/fxml/1"
-        fx:id="game"
+        fx:id="gamePane"
         fx:controller="ui.game.GameController"
+        stylesheets="@/css/game_styles.css, @/css/styles.css"
         >
     <AnchorPane fx:id="gameContainer" minHeight="0.0" minWidth="0.0">
         <children>
             <Group fx:id="gameGroup"/>
         </children>
     </AnchorPane>
+    <Separator styleClass="separator"/>
     <AnchorPane fx:id="gameBottom" minHeight="0.0" minWidth="0.0" />
 </VBox>

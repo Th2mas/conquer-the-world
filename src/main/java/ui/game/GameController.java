@@ -12,6 +12,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import service.PlayerService;
@@ -43,11 +44,10 @@ public class GameController {
     private Map<Country, Text> capitalMap;
 
     @FXML
-    public BorderPane gamePane;
+    public VBox gamePane;
 
     @FXML
     public Pane gameBottom;
-
 
     /**
      * A container for the game group
@@ -116,6 +116,7 @@ public class GameController {
         playerService = new SimplePlayerService(settingsManager);
 
         // Create the capital text objects and put them into the map
+        // TODO: Fix not-display bug
         continentList.forEach(continent -> continent.getCountries().forEach(country -> {
             Text text = new Text(country.getCapital().getX(), country.getCapital().getY(), "");
             text.setFill(Color.BLACK);
@@ -126,7 +127,7 @@ public class GameController {
 
         // TODO Later: Request the player's name and color
         // Create the player
-        Player player = playerService.createPlayer("Game.Player", false);
+        Player player = playerService.createPlayer("Player", false);
         player.setMove(true);
 
         // Create the oponents
@@ -147,8 +148,6 @@ public class GameController {
         initInformationPane();
 
         // Get the labels and add bind their text properties to the phase property
-        gamePane.setCenter(gameContainer);
-        gamePane.setBottom(gameBottom);
         gameBottom.getChildren().add(informationController.getView());
         informationController.armiesTextProperty().bindBidirectional(armiesProperty);
         informationController.phaseTextProperty().bindBidirectional(phaseProperty);

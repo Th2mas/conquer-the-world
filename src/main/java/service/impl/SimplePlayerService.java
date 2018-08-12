@@ -165,6 +165,11 @@ public class SimplePlayerService implements PlayerService {
         }
     }
 
+    /**
+     * Checks if the given country is not conquered
+     * @param country the country to be checked
+     * @return true, if free; otherwise false
+     */
     @Override
     public boolean isCountryFree(Country country) {
         boolean free = true;

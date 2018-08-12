@@ -3,13 +3,16 @@ package ui;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import ui.game.GameController;
+import ui.menu.MenuController;
 import util.properties.PropertiesManager;
 
 import java.io.IOException;
+import java.util.Locale;
 
 /**
  * The main controller for the application
@@ -32,7 +35,7 @@ public class MainController {
      * The main pane, which will contain all elements
      */
     @FXML
-    public AnchorPane mainPane;
+    public VBox mainPane;
 
     /**
      * The optional primary stage for closing the stage on close request
@@ -59,27 +62,27 @@ public class MainController {
      */
     private PropertiesManager settingsManager;
 
-
-
     /**
      * Initializes the necessities for the game
      */
     @FXML
     public void initialize(){
 
-        // Load the menu pane
-        initMenuPane();
-        top.getChildren().add(menuController.getView());
-
-        // Load the game pane
-        initGamePane();
-        center.getChildren().add(gameController.getView());
-
         // Create the new language manager
         langManager = new PropertiesManager("properties/lang");
 
         // Create the new settings manager
         settingsManager = new PropertiesManager("properties/settings");
+
+        //langManager.changeLocale(Locale.ENGLISH);
+
+        // Load the menu pane
+        initMenuBar();
+        top.getChildren().add(menuController.getView());
+
+        // Load the game pane
+        initGamePane();
+        center.getChildren().add(gameController.getView());
     }
 
     /**
@@ -102,10 +105,11 @@ public class MainController {
 
 
     // TODO: Do something about the duplicate code here...
-    private void initMenuPane(){
+    private void initMenuBar(){
         try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainController.class.getResource("/fxml/MenuPane.fxml"));
+            loader.setResources(langManager.getBundle());
+            loader.setLocation(MainController.class.getResource("/fxml/MenuBar.fxml"));
             loader.load();
 
             menuController = loader.getController();
@@ -118,6 +122,7 @@ public class MainController {
     private void initGamePane(){
         try {
             FXMLLoader loader = new FXMLLoader();
+            loader.setResources(langManager.getBundle());
             loader.setLocation(MainController.class.getResource("/fxml/GamePane.fxml"));
             loader.load();
 

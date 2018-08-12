@@ -24,6 +24,10 @@ public class LoaderController {
      */
     private List<Continent> continentList;
 
+    private PropertiesManager customManager;
+    private PropertiesManager windowManager;
+
+
     /**
      * Creates the game controller with the default map
      */
@@ -39,7 +43,8 @@ public class LoaderController {
         }
 
         // Get the window's properties file
-        PropertiesManager windowManager = new PropertiesManager("properties/window");
+        windowManager = new PropertiesManager("properties/window");
+        customManager = new PropertiesManager("properties/custom");
 
         int width = windowManager.getInt("window.size.x");
 
@@ -79,22 +84,22 @@ public class LoaderController {
             Color color = Color.WHITE;
             switch (continent.getName()){
                 case "North America":
-                    color = new Color(1,0.9,0,1);
+                    color = Color.valueOf(customManager.getString("Color.Continent.NorthAmerica"));
                     break;
                 case "South America":
-                    color = new Color(1,0.5,0,1);
+                    color = Color.valueOf(customManager.getString("Color.Continent.SouthAmerica"));
                     break;
                 case "Europe":
-                    color = Color.BLUE;
+                    color = Color.valueOf(customManager.getString("Color.Continent.Europe"));
                     break;
                 case "Africa":
-                    color = Color.BROWN;
+                    color = Color.valueOf(customManager.getString("Color.Continent.Africa"));
                     break;
                 case "Asia":
-                    color = Color.FORESTGREEN;
+                    color = Color.valueOf(customManager.getString("Color.Continent.Asia"));
                     break;
                 case "Australia":
-                    color = Color.VIOLET;
+                    color = Color.valueOf(customManager.getString("Color.Continent.Australia"));
                     break;
             }
             continent.setColor(color);

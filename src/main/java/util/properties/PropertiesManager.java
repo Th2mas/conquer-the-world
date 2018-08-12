@@ -63,7 +63,12 @@ public class PropertiesManager {
      * @param locale the locale for language support
      */
     public void changeLocale(Locale locale){
-        bundle = ResourceBundle.getBundle(bundleName, locale);
+        Locale loc = null;
+        for(Locale l : getSupportedLocales())
+            if(l.getLanguage().equals(locale.getLanguage()))
+                loc = l;
+        if(loc == null) loc = new Locale("en");
+        bundle = ResourceBundle.getBundle(bundleName, loc);
     }
 
     /**
@@ -99,5 +104,13 @@ public class PropertiesManager {
      */
     public Set<String> keySet(){
         return bundle.keySet();
+    }
+
+    /**
+     * Returns the bundle
+     * @return bundle
+     */
+    public ResourceBundle getBundle() {
+        return bundle;
     }
 }

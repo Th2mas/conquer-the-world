@@ -1,10 +1,12 @@
-package ui;
+package ui.menu;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
 import javafx.scene.layout.GridPane;
 import util.properties.PropertiesManager;
 
@@ -23,17 +25,19 @@ public class MenuController {
      * The pane with the top menu
      */
     @FXML
-    public GridPane menuPane;
+    public MenuBar menuBar;
 
-    private final PropertiesManager langManager;
+    /**
+     * The settings menu
+     */
+    @FXML
+    public Menu menuSettings;
 
-    public MenuController(){
-        // TODO: Make this injectable...
-        this.langManager = new PropertiesManager("properties/lang");
-    }
+    private PropertiesManager langManager;
 
     @FXML
     public void initialize(){
+        this.langManager = new PropertiesManager("properties/lang");
         initLanguageSupport(langManager);
     }
 
@@ -45,7 +49,6 @@ public class MenuController {
     private void initLanguageSupport(PropertiesManager langManager){
 
         ObservableList<String> languages = FXCollections.observableArrayList();
-
 
         langManager.getSupportedLocales().forEach(locale -> {
             // Map the languages manually
@@ -66,13 +69,13 @@ public class MenuController {
             }
         });
 
-        languageChooser.setPromptText(langManager.getString("Language.PromptText"));
+        //languageChooser.setPromptText(langManager.getString("Language.PromptText"));
 
-        languageChooser.setItems(languages);
-        languageChooser.setValue(languageChooser.getItems().get(0));
+        //languageChooser.setItems(languages);
+        //languageChooser.setValue(languageChooser.getItems().get(0));
     }
 
     public Parent getView(){
-        return menuPane;
+        return menuBar;
     }
 }
