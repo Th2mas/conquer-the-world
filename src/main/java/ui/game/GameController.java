@@ -3,25 +3,27 @@ package ui.game;
 import dto.Continent;
 import dto.Country;
 import dto.Player;
-import exceptions.NodeNotFoundException;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import service.PlayerService;
 import service.impl.SimplePlayerService;
+import ui.MainController;
 import ui.game.phase.Phase;
 import ui.game.phase.impl.AcquisitionPhase;
 import ui.game.phase.impl.ArmyPlacementPhase;
 import ui.game.phase.impl.EndRoundPhase;
 import ui.game.phase.impl.MoveAndAttackPhase;
-import util.GuiUtil;
 import util.properties.PropertiesManager;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -32,12 +34,21 @@ public class GameController {
     /**
      * Contains all continents
      */
-    private final List<Continent> continentList;
+    private List<Continent> continentList;
 
     /**
      * Contains the {@link Text} objects for every country
      */
-    private final Map<Country, Text> capitalMap;
+    private Map<Country, Text> capitalMap;
+
+    @FXML
+    public Pane gamePane;
+
+    @FXML
+    public Pane gameBottom;
+
+    @FXML
+    public Group gameGroup;
 
     /**
      * Defines the current phase
@@ -47,68 +58,51 @@ public class GameController {
     /**
      * The service for handling actions on players
      */
-    private final PlayerService playerService;
+    private PlayerService playerService;
 
     /**
      * The property, which notifies all listener, if the phase was changed
      */
-    private final StringProperty phaseProperty;
+    private StringProperty phaseProperty;
 
     /**
      * The property, which notifies all listener, if the number of armies was changed
      */
-    private final StringProperty armiesProperty;
-
-    /**
-     * The group, which contains all elements, that will be drawn on the main pane
-     */
-    private final Group root;
-
-    /**
-     * Contains the elements, which will be drawn on the info pane
-     */
-    private final Pane infoPane;
+    private StringProperty armiesProperty;
 
     /**
      * Handles the different languages
      */
-    private final PropertiesManager langManager;
+    private PropertiesManager langManager;
 
     /**
      * Handles the different settings
      */
-    private final PropertiesManager settingsManager;
+    private PropertiesManager settingsManager;
+
+    private InformationController informationController;
 
     // Sets the selected country
     private Country selectedCountry;
 
     // TODO: Switch to Spring for Field injection! (e.g. lang-, or settingsManager)
 
-    /**
-     * The constructor for the game controller, which handles the actual game logic
-     * @param continentList the list with all continents
-     * @param root the {@link Group} containing all objects, that will be drawn in the main pane
-     * @param infoPane the {@link Pane} containing all objects, that will be drawn in the info pane
-     */
-    public GameController(
-            List<Continent> continentList,
-            Group root,
-            Pane infoPane,
-            PropertiesManager langManager,
-            PropertiesManager settingsManager
-            ){
+    @FXML
+    public void initialize(){
+        // Load the game's content
+        LoaderController loaderController = new LoaderController(gameGroup);
 
-        Objects.requireNonNull(continentList);
-        Objects.requireNonNull(root);
-        Objects.requireNonNull(infoPane);
-        Objects.requireNonNull(langManager);
+        // TODO Optional: Maybe toggle colors?
+        loaderController.setColors();
+        loaderController.darkenPatchesOnMouseOver();
 
-        this.continentList = continentList;
-        this.currentPhase = new AcquisitionPhase(this);
+        continentList = loaderController.getContinentList();
+
+        this.langManager = new PropertiesManager("properties/lang");
+        this.settingsManager = new PropertiesManager("properties/settings");
+
+        this.currentPhase = new AcquisitionPhase(this, langManager);
         this.capitalMap = new HashMap<>();
-
-        this.langManager = langManager;
-        this.settingsManager = settingsManager;
 
         // Set a new player service
         playerService = new SimplePlayerService(settingsManager);
@@ -118,49 +112,44 @@ public class GameController {
             Text text = new Text(country.getCapital().getX(), country.getCapital().getY(), "");
             text.setFill(Color.BLACK);
             capitalMap.put(country, text);
-            root.getChildren().add(text);
+            gamePane.getChildren().add(text);
             text.setVisible(false);
         }));
 
-        this.root = root;
-        this.infoPane = infoPane;
-
         // TODO Later: Request the player's name and color
         // Create the player
-        Player player = playerService.createPlayer("Player", false);
+        Player player = playerService.createPlayer("Game.Player", false);
         player.setMove(true);
 
         // Create the oponents
         Player ai = playerService.createPlayer("Ai1", true);
-        ai.setColor(Color.GREY);
-
+        ai.setColor(Color.GREY);    // TODO: MOVE this to CSS
 
         // Bind the phase to the phase label
-        phaseProperty = new SimpleStringProperty(langManager.getString("Phase") +": " + currentPhase);
+        phaseProperty = new SimpleStringProperty(langManager.getString("Game.Phase") +": " + currentPhase);
 
         // Bind the number of armies to the armies label
-        armiesProperty = new SimpleStringProperty(langManager.getString("Armies") +": " + 0);
+        armiesProperty = new SimpleStringProperty(langManager.getString("Game.Armies") +": " + 0);
         player.armiesProperty().addListener(((observable, oldValue, newValue) -> {
             System.out.println("Old armies: " + oldValue + ", new armies: " + newValue);
-            armiesProperty.set(langManager.getString("Armies") +": " + newValue);
+            armiesProperty.set(langManager.getString("Game.Armies") +": " + newValue);
         }));
 
-        // Get the labels and add bind their text properties to the phase property
-        try {
-            Label lbl_armies = (Label) GuiUtil.searchNodeById(infoPane, "lbl_armies");
-            Label lbl_phase = (Label) GuiUtil.searchNodeById(infoPane, "lbl_phase");
+        // Initialize the bottom pane
+        initInformationPane();
 
-            lbl_phase.textProperty().bindBidirectional(phaseProperty);
-            lbl_armies.textProperty().bindBidirectional(armiesProperty);
-        } catch (NodeNotFoundException e) {
-            System.err.println("Could not find given nodes");
-        }
+        // Get the labels and add bind their text properties to the phase property
+        gameBottom.getChildren().add(informationController.getView());
+        informationController.armiesTextProperty().bindBidirectional(armiesProperty);
+        informationController.phaseTextProperty().bindBidirectional(phaseProperty);
+
+        start();
     }
 
     /**
      * Starts the phases
      */
-    public void start(){
+    private void start(){
 
         // Start the game
         continentList.forEach(continent -> continent.getCountries().forEach(country -> {
@@ -181,7 +170,7 @@ public class GameController {
         phaseProperty.addListener(((observable, oldValue, newValue) -> {
 
             Player currentPlayer = playerService.getCurrentPlayer();
-            System.out.println("Current" + langManager.getString("Player") +": " + currentPlayer.getName());
+            System.out.println("Current" + langManager.getString("Game.Player") +": " + currentPlayer.getName());
 
             if(currentPlayer.isAi()){
                 while(currentPhase.getClass() == ArmyPlacementPhase.class){
@@ -196,13 +185,13 @@ public class GameController {
                             currentPhase.dragDrop(neighbor.getCapital().getX(), neighbor.getCapital().getY(), country);
                         }
                     }
-                    new EndRoundPhase(this);
+                    new EndRoundPhase(this, langManager);
                     // TODO: Fix next round phase (some stack trace...)
                 }
             }
 
             if(currentPlayer.getCountries().size() == capitalMap.keySet().size()){
-                System.out.println(langManager.getString("Player") + currentPlayer.getName() + " has won!");
+                System.out.println(langManager.getString("Game.Player") + currentPlayer.getName() + " has won!");
             }
         }));
     }
@@ -239,7 +228,7 @@ public class GameController {
      * @param player the player which is used to display army information
      */
     public void showArmiesLabel(Player player){
-        armiesProperty.set(langManager.getString("Armies") +": " + player.getArmies());
+        armiesProperty.set(langManager.getString("Game.Armies") +": " + player.getArmies());
     }
 
     /**
@@ -295,7 +284,7 @@ public class GameController {
      */
     public void setPhase(Phase phase){
         currentPhase = phase;
-        phaseProperty.set(langManager.getString("Phase") +": " + phase);
+        phaseProperty.set(langManager.getString("Game.Phase") +": " + phase);
     }
 
     /**
@@ -305,5 +294,22 @@ public class GameController {
     public void setOnKeyPressed(Scene scene){
         // Define what will happen on key pressed
         scene.setOnKeyPressed(event -> currentPhase.setOnKeyPressed(event));
+    }
+
+    // TODO: Do something about the duplicate code here...
+    private void initInformationPane(){
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(MainController.class.getResource("/fxml/InfoPane.fxml"));
+            loader.load();
+
+            informationController = loader.getController();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Parent getView(){
+        return gamePane;
     }
 }

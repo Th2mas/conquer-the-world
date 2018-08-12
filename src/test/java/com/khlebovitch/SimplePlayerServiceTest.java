@@ -43,7 +43,7 @@ public class SimplePlayerServiceTest {
 
     @Test(expected = CountryNotAvailableException.class)
     public void addCountry_shouldNotAddEnemiesCountry() throws CountryNotAvailableException {
-        Player player = playerService.createPlayer("Player", false);
+        Player player = playerService.createPlayer("Game.Player", false);
         Player enemy = playerService.createPlayer("Enemy", false);
         Country c = new Country("Bla", new ArrayList<>(), new Point2D(0,0));
 

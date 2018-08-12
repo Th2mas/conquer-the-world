@@ -6,6 +6,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import ui.game.GameController;
 import ui.game.phase.Phase;
+import util.properties.PropertiesManager;
 
 /**
  * The army placement phase
@@ -14,8 +15,14 @@ public class ArmyPlacementPhase implements Phase {
 
     private GameController gameController;
 
-    public ArmyPlacementPhase(GameController gameController) {
+    private PropertiesManager langManager;
+
+    public ArmyPlacementPhase(
+            GameController gameController,
+            PropertiesManager langManager
+    ) {
         this.gameController = gameController;
+        this.langManager = langManager;
     }
 
     @Override
@@ -32,7 +39,7 @@ public class ArmyPlacementPhase implements Phase {
         gameController.showArmiesOnCountries();
 
         // Check if the phase switches to 'CONQUERING_MOVE_AND_ATTACK'
-        if(currentPlayer.getArmies()==0) gameController.setPhase(new MoveAndAttackPhase(gameController));
+        if(currentPlayer.getArmies()==0) gameController.setPhase(new MoveAndAttackPhase(gameController, langManager));
     }
 
     @Override
@@ -52,6 +59,6 @@ public class ArmyPlacementPhase implements Phase {
 
     @Override
     public String toString() {
-        return "Army Placement";
+        return langManager.getString("Game.Phase.ArmyPlacement");
     }
 }

@@ -4,6 +4,7 @@ import dto.Continent;
 import exceptions.IllegalCommandException;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
+import javafx.scene.Parent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import util.error.ErrorDialog;
@@ -116,6 +117,7 @@ public class LoaderController {
 
     /**
      * Scales all patches with the given factor
+     * TODO: Doesn't scale correctly
      * @param factor scale factor
      */
     public void scalePatches(double factor){

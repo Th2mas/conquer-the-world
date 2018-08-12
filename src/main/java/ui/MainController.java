@@ -1,6 +1,7 @@
 package ui;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
@@ -9,10 +10,24 @@ import ui.game.GameController;
 import ui.game.LoaderController;
 import util.properties.PropertiesManager;
 
+import java.io.IOException;
+
 /**
  * The main controller for the application
  */
 public class MainController {
+
+    /**
+     * The top pane for the menu
+     */
+    @FXML
+    public Pane top;
+
+    /**
+     * The center pane, which will contain the continents
+     */
+    @FXML
+    public Pane center;
 
     /**
      * The optional primary stage for closing the stage on close request
@@ -23,6 +38,11 @@ public class MainController {
      * The controller, which handles the game logic
      */
     private GameController gameController;
+
+    /**
+     * The controller for the top menu
+     */
+    private MenuController menuController;
 
     /**
      * Manages the different languages
@@ -47,39 +67,24 @@ public class MainController {
     private Pane root;
 
     /**
-     * The pane in which all information will be displayed
-     */
-    @FXML
-    private Pane infoPane;
-
-    /**
      * Initializes the necessities for the game
      */
     @FXML
     public void initialize(){
 
-        // Load the game's content
-        LoaderController loaderController = new LoaderController(group);
+        // Load the menu pane
+        initMenuPane();
+        top.getChildren().add(menuController.getView());
 
-        // TODO Optional: Maybe toggle colors?
-        loaderController.setColors();
-        loaderController.darkenPatchesOnMouseOver();
+        // Load the game pane
+        initGamePane();
+        center.getChildren().add(gameController.getView());
 
         // Create the new language manager
         langManager = new PropertiesManager("properties/lang");
 
         // Create the new settings manager
         settingsManager = new PropertiesManager("properties/settings");
-
-        // Create the new game controller
-        gameController = new GameController(loaderController.getContinentList(),
-                group,
-                infoPane,
-                langManager,
-                settingsManager);
-
-        // Start the game
-        gameController.start();
     }
 
     /**
@@ -97,6 +102,34 @@ public class MainController {
 
         // Show the contents
         primaryStage.show();
+    }
+
+
+
+    // TODO: Do something about the duplicate code here...
+    private void initMenuPane(){
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(MainController.class.getResource("/fxml/MenuPane.fxml"));
+            loader.load();
+
+            menuController = loader.getController();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // TODO: Do something about the duplicate code here...
+    private void initGamePane(){
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(MainController.class.getResource("/fxml/GamePane.fxml"));
+            loader.load();
+
+            gameController = loader.getController();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

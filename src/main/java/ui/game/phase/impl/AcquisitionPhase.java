@@ -7,6 +7,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.shape.Polygon;
 import ui.game.GameController;
 import ui.game.phase.Phase;
+import util.properties.PropertiesManager;
 
 /**
  * The acquisition phase
@@ -15,8 +16,14 @@ public class AcquisitionPhase implements Phase {
 
     private GameController gameController;
 
-    public AcquisitionPhase(GameController gameController){
+    private PropertiesManager langManager;
+
+    public AcquisitionPhase(
+            GameController gameController,
+            PropertiesManager langManager
+    ){
         this.gameController = gameController;
+        this.langManager = langManager;
     }
 
     @Override
@@ -67,16 +74,11 @@ public class AcquisitionPhase implements Phase {
 
         // Check if the phase switches to 'CONQUERING_ARMY_PLACEMENT'
         if(sumCountries == sizes) {
-            gameController.setPhase(new ArmyPlacementPhase(gameController));
-            // TODO: Set another text for the phaseproperty -> read it from a specific language properties file
-            // TODO: Do the same for armiesproperty
-
+            gameController.setPhase(new ArmyPlacementPhase(gameController, langManager));
             // Set the armies for the player
             gameController.setArmies(currentPlayer);
             gameController.showArmiesLabel(currentPlayer);
             gameController.showArmiesOnCountries();
-
-
         }
     }
 
@@ -96,9 +98,8 @@ public class AcquisitionPhase implements Phase {
 
     }
 
-    // TODO: Make the text dependent from the language
     @Override
-    public String toString() {
-        return "Acquisition";
+    public String toString(){
+        return langManager.getString("Game.Phase.Acquisition");
     }
 }

@@ -5,6 +5,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import ui.game.GameController;
 import ui.game.phase.Phase;
+import util.properties.PropertiesManager;
 
 /**
  * The end round phase
@@ -13,8 +14,15 @@ public class EndRoundPhase implements Phase {
 
     private GameController gameController;
 
-    public EndRoundPhase(GameController gameController) {
+    private PropertiesManager langManager;
+
+    public EndRoundPhase(
+            GameController gameController,
+            PropertiesManager langManager
+    ) {
         this.gameController = gameController;
+        this.langManager = langManager;
+
         // TODO: Something is not working here...
         //gameController.getPlayerService().nextTurn();
         //gameController.setPhase(new ArmyPlacementPhase(gameController));
@@ -42,6 +50,6 @@ public class EndRoundPhase implements Phase {
 
     @Override
     public String toString() {
-        return "End Round";
+        return langManager.getString("Game.Phase.EndRound");
     }
 }

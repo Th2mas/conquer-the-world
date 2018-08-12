@@ -11,6 +11,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import ui.game.GameController;
 import ui.game.phase.Phase;
+import util.properties.PropertiesManager;
+
+import java.util.Objects;
 
 /**
  * The move and attack phase
@@ -18,10 +21,20 @@ import ui.game.phase.Phase;
 public class MoveAndAttackPhase implements Phase {
 
     private GameController gameController;
+
+    private PropertiesManager langManager;
+
     private boolean drag;
 
-    MoveAndAttackPhase(GameController gameController) {
+    MoveAndAttackPhase(
+            GameController gameController,
+            PropertiesManager langManager
+    ) {
+        Objects.requireNonNull(gameController);
+        Objects.requireNonNull(langManager);
+
         this.gameController = gameController;
+        this.langManager = langManager;
         drag = false;
     }
 
@@ -102,6 +115,6 @@ public class MoveAndAttackPhase implements Phase {
 
     @Override
     public String toString() {
-        return "Move And Attack";
+        return langManager.getString("Game.Phase.MoveAndAttack");
     }
 }

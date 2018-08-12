@@ -1,6 +1,5 @@
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.stage.Stage;
 import ui.MainController;
 import util.error.ErrorDialog;
