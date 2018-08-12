@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import service.PlayerService;
 import service.impl.SimplePlayerService;
+import util.properties.PropertiesManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,7 @@ public class SimplePlayerServiceTest {
 
     @Before
     public void setUp(){
-        playerService = new SimplePlayerService();
+        playerService = new SimplePlayerService(new PropertiesManager("properties/settings"));
     }
 
     @After
@@ -55,8 +56,6 @@ public class SimplePlayerServiceTest {
     public void setArmies_shouldSetCorrectNumberOfArmies(){
         Player player = playerService.createPlayer();
         Assert.assertEquals(player.getArmies(), 0);
-
-
 
         throw new NotImplementedException();
     }

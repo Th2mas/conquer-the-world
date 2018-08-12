@@ -1,7 +1,7 @@
 package util.properties;
 
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.io.File;
+import java.util.*;
 
 /**
  * A manager for a given {@code .properties} file
@@ -11,17 +11,24 @@ public class PropertiesManager {
     /**
      * The resource bundle for managing the file
      */
-    private final ResourceBundle bundle;
+    private ResourceBundle bundle;
+
+    /**
+     * The name of the file used for the ResourceBundle
+     */
+    private final String bundleName;
 
     /**
      * Creates a new PropertiesManager
      * @param name the name of the requested properties file
      */
     public PropertiesManager(String name){
+
         if(name.endsWith(".properties"))
-            this.bundle = ResourceBundle.getBundle(name.substring(0, name.length()-".properties".length()));
-        else
-            this.bundle = ResourceBundle.getBundle(name);
+            name = name.substring(0, name.length()-".properties".length());
+
+        bundleName = (name.contains("/")?name.substring(name.indexOf("/")+1):name);
+        this.bundle = ResourceBundle.getBundle(name);
     }
 
     /**
@@ -49,6 +56,41 @@ public class PropertiesManager {
      */
     public boolean getBoolean(String key){
         return Boolean.parseBoolean(bundle.getString(key));
+    }
+
+    /**
+     * Change the ResourceBundles locale
+     * @param locale the locale for language support
+     */
+    public void changeLocale(Locale locale){
+        bundle = ResourceBundle.getBundle(bundleName, locale);
+    }
+
+    /**
+     * Returns a list of supported locales
+     * @return a list of supported locales; the list is empty, if there are no files
+     */
+    public List<Locale> getSupportedLocales(){
+        List<Locale> list = new ArrayList<>();
+
+        File f = new File(PropertiesManager.class.getResource("/properties").getFile());
+        File[] files = f.listFiles();
+
+        // Checks if there are any files in the Resource bundle
+        if(files == null) {
+            System.err.println("Error: \"properties\" does not exist");
+            return list;
+        }
+
+        // Iterate over all files in the "properties" directory
+        for (File file : files){
+            String name = file.getName();
+            name = name.substring(0, name.lastIndexOf("."));
+            if(name.contains(bundleName) && name.contains("_"))
+                list.add(new Locale(name.substring(name.indexOf("_")+1)));
+        }
+
+        return list;
     }
 
     /**

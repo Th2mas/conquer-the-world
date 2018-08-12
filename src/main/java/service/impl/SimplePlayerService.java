@@ -9,12 +9,10 @@ import javafx.scene.paint.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.PlayerService;
+import util.properties.PropertiesManager;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static ui.game.GameController.MAX_ATTACK_ARMIES;
-import static ui.game.GameController.MAX_DEFENDING_ARMIES;
 
 public class SimplePlayerService implements PlayerService {
 
@@ -22,10 +20,12 @@ public class SimplePlayerService implements PlayerService {
 
     private List<Player> players;
 
-    public SimplePlayerService(){
-        players = new ArrayList<>();
-    }
+    private PropertiesManager settingsManager;
 
+    public SimplePlayerService(PropertiesManager settingsManager){
+        players = new ArrayList<>();
+        this.settingsManager = settingsManager;
+    }
 
     @Override
     public Player createPlayer() {
@@ -91,9 +91,9 @@ public class SimplePlayerService implements PlayerService {
         int defendArmies;
 
         // Decide how many armies can attack the opponent
-        attackingArmies = (p1.getArmies(attackCountry) <= MAX_ATTACK_ARMIES && p1.getArmies(attackCountry) > 1)
+        attackingArmies = (p1.getArmies(attackCountry) <= settingsManager.getInt("Game.MaxAttackArmies") && p1.getArmies(attackCountry) > 1)
                 ? p1.getArmies(attackCountry)-1
-                : MAX_ATTACK_ARMIES;
+                : settingsManager.getInt("Game.MaxAttackArmies");
         p1.setArmies(attackCountry, p1.getArmies(attackCountry)-attackingArmies);
 
         // Get the player, who owns the country
@@ -111,7 +111,7 @@ public class SimplePlayerService implements PlayerService {
         Player p2 = op.get();
 
         // Decide how many armies can defend the attacked country
-        defendArmies = (p2.getArmies(defendCountry) <= MAX_DEFENDING_ARMIES) ? p2.getArmies(defendCountry) : MAX_DEFENDING_ARMIES;
+        defendArmies = (p2.getArmies(defendCountry) <= settingsManager.getInt("Game.MaxDefendArmies")) ? p2.getArmies(defendCountry) : settingsManager.getInt("Game.MaxDefendArmies");
         p2.setArmies(defendCountry, p2.getArmies(defendCountry)-defendArmies);
 
         // To save the thrown dices, we need to use an array

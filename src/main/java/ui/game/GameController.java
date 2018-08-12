@@ -20,6 +20,7 @@ import ui.game.phase.impl.ArmyPlacementPhase;
 import ui.game.phase.impl.EndRoundPhase;
 import ui.game.phase.impl.MoveAndAttackPhase;
 import util.GuiUtil;
+import util.properties.PropertiesManager;
 
 import java.util.*;
 
@@ -27,18 +28,6 @@ import java.util.*;
  * The controller, which handles the actual game logic
  */
 public class GameController {
-
-    /**
-     * Defines how many armies can attack a country at once
-     * TODO: Move me to a properties file and load it afterwards
-     */
-    public static final int MAX_ATTACK_ARMIES = 3;
-
-    /**
-     * Tells how many armies can defend a country at once
-     * TODO: Move me to a properties file and load it afterwards
-     */
-    public static final int MAX_DEFENDING_ARMIES = 2;
 
     /**
      * Contains all continents
@@ -80,8 +69,20 @@ public class GameController {
      */
     private final Pane infoPane;
 
+    /**
+     * Handles the different languages
+     */
+    private final PropertiesManager langManager;
+
+    /**
+     * Handles the different settings
+     */
+    private final PropertiesManager settingsManager;
+
     // Sets the selected country
     private Country selectedCountry;
+
+    // TODO: Switch to Spring for Field injection! (e.g. lang-, or settingsManager)
 
     /**
      * The constructor for the game controller, which handles the actual game logic
@@ -89,18 +90,28 @@ public class GameController {
      * @param root the {@link Group} containing all objects, that will be drawn in the main pane
      * @param infoPane the {@link Pane} containing all objects, that will be drawn in the info pane
      */
-    public GameController(List<Continent> continentList, Group root, Pane infoPane){
+    public GameController(
+            List<Continent> continentList,
+            Group root,
+            Pane infoPane,
+            PropertiesManager langManager,
+            PropertiesManager settingsManager
+            ){
 
         Objects.requireNonNull(continentList);
         Objects.requireNonNull(root);
         Objects.requireNonNull(infoPane);
+        Objects.requireNonNull(langManager);
 
         this.continentList = continentList;
         this.currentPhase = new AcquisitionPhase(this);
         this.capitalMap = new HashMap<>();
 
+        this.langManager = langManager;
+        this.settingsManager = settingsManager;
+
         // Set a new player service
-        playerService = new SimplePlayerService();
+        playerService = new SimplePlayerService(settingsManager);
 
         // Create the capital text objects and put them into the map
         continentList.forEach(continent -> continent.getCountries().forEach(country -> {
@@ -125,13 +136,13 @@ public class GameController {
 
 
         // Bind the phase to the phase label
-        phaseProperty = new SimpleStringProperty("Phase: " + currentPhase);
+        phaseProperty = new SimpleStringProperty(langManager.getString("Phase") +": " + currentPhase);
 
         // Bind the number of armies to the armies label
-        armiesProperty = new SimpleStringProperty("Armies: " + 0);
+        armiesProperty = new SimpleStringProperty(langManager.getString("Armies") +": " + 0);
         player.armiesProperty().addListener(((observable, oldValue, newValue) -> {
             System.out.println("Old armies: " + oldValue + ", new armies: " + newValue);
-            armiesProperty.set("Armies: " + newValue);
+            armiesProperty.set(langManager.getString("Armies") +": " + newValue);
         }));
 
         // Get the labels and add bind their text properties to the phase property
@@ -170,7 +181,7 @@ public class GameController {
         phaseProperty.addListener(((observable, oldValue, newValue) -> {
 
             Player currentPlayer = playerService.getCurrentPlayer();
-            System.out.println("Current Player: " + currentPlayer.getName());
+            System.out.println("Current" + langManager.getString("Player") +": " + currentPlayer.getName());
 
             if(currentPlayer.isAi()){
                 while(currentPhase.getClass() == ArmyPlacementPhase.class){
@@ -191,7 +202,7 @@ public class GameController {
             }
 
             if(currentPlayer.getCountries().size() == capitalMap.keySet().size()){
-                System.out.println("Player " + currentPlayer.getName() + " has won!");
+                System.out.println(langManager.getString("Player") + currentPlayer.getName() + " has won!");
             }
         }));
     }
@@ -228,7 +239,7 @@ public class GameController {
      * @param player the player which is used to display army information
      */
     public void showArmiesLabel(Player player){
-        armiesProperty.set("Armies: " + player.getArmies());
+        armiesProperty.set(langManager.getString("Armies") +": " + player.getArmies());
     }
 
     /**
@@ -284,7 +295,7 @@ public class GameController {
      */
     public void setPhase(Phase phase){
         currentPhase = phase;
-        phaseProperty.set("Phase: " + phase);
+        phaseProperty.set(langManager.getString("Phase") +": " + phase);
     }
 
     /**

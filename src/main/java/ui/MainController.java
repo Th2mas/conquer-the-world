@@ -7,6 +7,7 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import ui.game.GameController;
 import ui.game.LoaderController;
+import util.properties.PropertiesManager;
 
 /**
  * The main controller for the application
@@ -22,6 +23,16 @@ public class MainController {
      * The controller, which handles the game logic
      */
     private GameController gameController;
+
+    /**
+     * Manages the different languages
+     */
+    private PropertiesManager langManager;
+
+    /**
+     * Manages the different settings
+     */
+    private PropertiesManager settingsManager;
 
     /**
      * The container for the polygons
@@ -54,8 +65,18 @@ public class MainController {
         loaderController.setColors();
         loaderController.darkenPatchesOnMouseOver();
 
+        // Create the new language manager
+        langManager = new PropertiesManager("properties/lang");
+
+        // Create the new settings manager
+        settingsManager = new PropertiesManager("properties/settings");
+
         // Create the new game controller
-        gameController = new GameController(loaderController.getContinentList(), group, infoPane);
+        gameController = new GameController(loaderController.getContinentList(),
+                group,
+                infoPane,
+                langManager,
+                settingsManager);
 
         // Start the game
         gameController.start();
