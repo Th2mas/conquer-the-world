@@ -93,7 +93,7 @@ public class MoveAndAttackPhase implements Phase {
 
         switch(event.getText().toLowerCase()){
             case "e":
-                new EndRoundPhase(gameController);
+                //new EndRoundPhase(gameController);
                 break;
             default:
                 break;

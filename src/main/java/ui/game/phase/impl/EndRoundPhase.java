@@ -15,8 +15,9 @@ public class EndRoundPhase implements Phase {
 
     public EndRoundPhase(GameController gameController) {
         this.gameController = gameController;
-        gameController.getPlayerService().nextTurn();
-        gameController.setPhase(new ArmyPlacementPhase(gameController));
+        // TODO: Something is not working here...
+        //gameController.getPlayerService().nextTurn();
+        //gameController.setPhase(new ArmyPlacementPhase(gameController));
     }
 
     @Override
