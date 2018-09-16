@@ -1,7 +1,7 @@
 import javafx.application.Application;
 import javafx.stage.Stage;
 import ui.MainController;
-import util.error.DialogHelper;
+import util.dialog.DialogHelper;
 import util.fxml.FXMLHelper;
 import util.properties.PropertiesManager;
 
@@ -17,11 +17,16 @@ public class MainApplication extends Application{
      */
     private Stage primaryStage;
 
+    /**
+     * Start the main application
+     * @param primaryStage the main stage
+     */
     @Override
     public void start(Stage primaryStage) {
 
         this.primaryStage = primaryStage;
 
+        // This has to be done before anything else
         PropertiesManager.initialize();
 
         // Set the window parameters

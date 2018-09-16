@@ -8,7 +8,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.error.DialogHelper;
+import util.dialog.DialogHelper;
 import util.properties.PropertiesManager;
 import util.reader.impl.SimpleMapReader;
 
@@ -91,13 +91,13 @@ public class LoaderController {
                     color = Color.valueOf(PropertiesManager.getString("Color.Continent.Europe", "custom"));
                     break;
                 case "Africa":
-                    color = Color.valueOf(PropertiesManager.getString("Color.Continent.Africa","custom"));
+                    color = Color.valueOf(PropertiesManager.getString("Color.Continent.Africa", "custom"));
                     break;
                 case "Asia":
-                    color = Color.valueOf(PropertiesManager.getString("Color.Continent.Asia","custom"));
+                    color = Color.valueOf(PropertiesManager.getString("Color.Continent.Asia", "custom"));
                     break;
                 case "Australia":
-                    color = Color.valueOf(PropertiesManager.getString("Color.Continent.Australia","custom"));
+                    color = Color.valueOf(PropertiesManager.getString("Color.Continent.Australia", "custom"));
                     break;
             }
             continent.setColor(color);

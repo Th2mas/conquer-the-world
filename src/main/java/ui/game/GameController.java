@@ -22,6 +22,7 @@ import ui.game.phase.impl.AcquisitionPhase;
 import ui.game.phase.impl.ArmyPlacementPhase;
 import ui.game.phase.impl.EndRoundPhase;
 import ui.game.phase.impl.MoveAndAttackPhase;
+import util.dialog.DialogHelper;
 import util.fxml.FXMLHelper;
 import util.properties.PropertiesManager;
 
@@ -133,14 +134,14 @@ public class GameController {
 
         // Bind the phase to the phase label
         phaseProperty = new SimpleStringProperty(PropertiesManager.getString("Game.Phase", "lang") +": " + currentPhase);
-
+        phaseProperty.addListener((observable, oldValue, newValue) -> setPhase(currentPhase));
+        PropertiesManager.addSubscriber(phaseProperty);
 
         // Bind the number of armies to the armies label
         armiesProperty = new SimpleStringProperty(PropertiesManager.getString("Game.Armies", "lang") +": " + 0);
-        player.armiesProperty().addListener(((observable, oldValue, newValue) -> {
-            System.out.println("Old armies: " + oldValue + ", new armies: " + newValue);
-            armiesProperty.set(PropertiesManager.getString("Game.Armies", "lang") +": " + newValue);
-        }));
+        armiesProperty.addListener((observable, oldValue, newValue) -> showArmiesLabel(player));
+        player.armiesProperty().addListener((observable, oldValue, newValue) -> showArmiesLabel(player));
+        PropertiesManager.addSubscriber(armiesProperty);
 
         // Initialize the bottom pane
         try {
@@ -150,7 +151,7 @@ public class GameController {
             return;
         }
 
-        // Get the labels and add bind their text properties to the phase property
+        // Get the labels and bind their text properties to the respective properties
         gameBottom.getChildren().add(informationController.getView());
         informationController.armiesTextProperty().bindBidirectional(armiesProperty);
         informationController.phaseTextProperty().bindBidirectional(phaseProperty);
@@ -165,7 +166,6 @@ public class GameController {
 
         // Start the game
         continentList.forEach(continent -> continent.getCountries().forEach(country -> {
-
             country.getPatches().forEach(patch -> {
 
                 // CLICKED
@@ -182,7 +182,7 @@ public class GameController {
         phaseProperty.addListener(((observable, oldValue, newValue) -> {
 
             Player currentPlayer = playerService.getCurrentPlayer();
-            System.out.println("Current" + PropertiesManager.getString("Game.Player", "lang") +": " + currentPlayer.getName());
+            LOGGER.info("Current " + PropertiesManager.getString("Game.Player", "lang") +": " + currentPlayer.getName());
 
             if(currentPlayer.isAi()){
                 while(currentPhase.getClass() == ArmyPlacementPhase.class){
@@ -203,7 +203,14 @@ public class GameController {
             }
 
             if(currentPlayer.getCountries().size() == capitalMap.keySet().size()){
-                LOGGER.info(PropertiesManager.getString("Game.Player", "lang") + currentPlayer.getName() + " has won!");
+                String msg = String.join(" ",
+                        PropertiesManager.getString("Game.Player", "lang"),
+                        currentPlayer.getName(),
+                        PropertiesManager.getString("Dialog.Won", "lang")
+                );
+
+                DialogHelper.createInformationDialog(msg);
+                LOGGER.info(msg);
             }
         }));
     }

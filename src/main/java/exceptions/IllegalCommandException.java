@@ -12,7 +12,7 @@ public class IllegalCommandException extends Exception {
 
     /**
      * Creates a new illegal command exception
-     * @param s error message
+     * @param s dialog message
      */
     public IllegalCommandException(String s){
         LOGGER.info(s);

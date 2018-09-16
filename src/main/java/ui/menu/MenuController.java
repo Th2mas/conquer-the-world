@@ -7,7 +7,7 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.error.DialogHelper;
+import util.dialog.DialogHelper;
 import util.properties.PropertiesManager;
 
 import java.util.List;
@@ -50,6 +50,13 @@ public class MenuController {
 
         // Set the click listener for the 'Choose language' menu
         menuItemLanguage.setOnAction(event -> showLanguageDialog());
+
+        // Add language change listener
+        addLanguageChangeListener(menuSettings, "Menu.Settings");
+        PropertiesManager.addSubscriber(menuSettings.textProperty());
+
+        addLanguageChangeListener(menuItemLanguage, "Dialog.Title.Language");
+        PropertiesManager.addSubscriber(menuItemLanguage.textProperty());
     }
 
     /**
@@ -61,13 +68,32 @@ public class MenuController {
 
         String languageText = "Language";
 
+        // Get all available languages
         List<String> languages = PropertiesManager.getAllStrings(languageText, "settings");
 
-        // TODO: Check how you can notify the main application, that the language has changed
-        Optional<String> result = DialogHelper.createChoiceDialog(languageText, languages, PropertiesManager.getBundle("lang")).showAndWait();
+        // Wait until the user has chosen a language
+        Optional<String> result = DialogHelper.createLanguageChoiceDialog(languageText, languages, PropertiesManager.getBundle("lang")).showAndWait();
+
+        // Change the language
         result.ifPresent(PropertiesManager::changeLanguage);
     }
 
+    /**
+     * Changs the language of a menu item
+     * @param item the menu item to be changed
+     * @param key the key, which is used for finding the item's value
+     */
+    private void addLanguageChangeListener(MenuItem item, String key) {
+        item.textProperty().addListener(
+                (observable, oldValue, newValue) ->
+                        item.textProperty().setValue(PropertiesManager.getString(key, "lang"))
+        );
+    }
+
+    /**
+     * Get the menu bar as a parent of the fxml file
+     * @return menuBar
+     */
     public Parent getView(){
         return menuBar;
     }

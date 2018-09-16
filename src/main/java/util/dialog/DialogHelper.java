@@ -1,4 +1,4 @@
-package util.error;
+package util.dialog;
 
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -8,6 +8,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.properties.PropertiesManager;
 
 import java.util.List;
 import java.util.ResourceBundle;
@@ -26,8 +27,8 @@ public class DialogHelper {
     private DialogHelper(){}
 
     /**
-     * Creates an error dialog with the given error text
-     * @param errorText the error text to be displayed
+     * Creates an dialog dialog with the given dialog text
+     * @param errorText the dialog text to be displayed
      */
     public static void createErrorDialog(String errorText){
         LOGGER.debug("Enter createErrorDialog");
@@ -49,15 +50,34 @@ public class DialogHelper {
         alert.show();
     }
 
-    public static ChoiceDialog<String> createChoiceDialog(String choiceText, List<String> choices, ResourceBundle bundle) {
+    /**
+     * Creates a choice dialog
+     * @param choiceText the key, which will be used for searching the dialog text
+     * @param activeItem the active item
+     * @param choices the list of different choices
+     * @param bundle the bundle to be used
+     * @return a choice dialog
+     */
+    public static ChoiceDialog<String> createChoiceDialog(String choiceText, String activeItem, List<String> choices, ResourceBundle bundle) {
         LOGGER.debug("Enter createChoiceDialog");
-        ChoiceDialog<String> dialog = new ChoiceDialog<>(choices.get(0), choices);
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(activeItem, choices);
 
         dialog.setTitle(bundle.getString("Dialog.Title." + choiceText));
         dialog.setHeaderText(bundle.getString("Dialog.Header." + choiceText));
-        dialog.setContentText(bundle.getString("Dialog.Content." + choiceText));
+        dialog.setContentText(bundle.getString("Dialog.Content." + choiceText) + ": ");
 
         return dialog;
+    }
+
+    /**
+     * Creates a language choice dialog with the current language as the active item
+     * @param choiceText the key, which will be used for searching the dialog text
+     * @param choices the list of different choices
+     * @param bundle the bundle to be used
+     * @return a choice dialog
+     */
+    public static ChoiceDialog<String> createLanguageChoiceDialog(String choiceText, List<String> choices, ResourceBundle bundle) {
+        return createChoiceDialog(choiceText, PropertiesManager.getCurrentLanguage(), choices, bundle);
     }
 
     /**
