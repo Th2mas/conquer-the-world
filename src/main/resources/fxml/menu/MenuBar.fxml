@@ -14,7 +14,7 @@
     <menus>
         <Menu id="menuSettings" fx:id="menuSettings" mnemonicParsing="false" text="%Menu.Settings">
             <items>
-                <MenuItem text="%Menu.Choose.Language" />
+                <MenuItem fx:id="menuItemLanguage" text="%Dialog.Title.Language" />
             </items>
         </Menu>
     </menus>

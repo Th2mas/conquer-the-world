@@ -8,7 +8,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.error.ErrorDialog;
+import util.error.DialogHelper;
 import util.properties.PropertiesManager;
 import util.reader.impl.SimpleMapReader;
 
@@ -42,7 +42,7 @@ public class LoaderController {
         // Try to get the default map
         try { continentList = new SimpleMapReader().readFile(LoaderController.class.getResource("/map/world.map").getPath()); }
         catch (IOException | IllegalCommandException e) {
-            ErrorDialog.showErrorDialog(e.getMessage());
+            DialogHelper.createErrorDialog(e.getMessage());
             // Exit the program
             // TODO: Maybe end the program otherwise
             throw new RuntimeException(e.getMessage());

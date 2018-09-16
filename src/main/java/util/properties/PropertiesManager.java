@@ -2,9 +2,11 @@ package util.properties;
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A manager for a given {@code .properties} file
+ * TODO: Make a static manager with a map as reference!
  */
 public class PropertiesManager {
 
@@ -38,6 +40,18 @@ public class PropertiesManager {
      */
     public String getString(String key){
         return bundle.getString(key);
+    }
+
+    /**
+     * Returns a list of strings, which start with startsWith
+     * @param startsWith the string, which will be used for filtering
+     * @return a list with all filtered strings
+     */
+    public List<String> getAllStrings(String startsWith) {
+        return keySet().stream()
+                .filter(s -> s.startsWith(startsWith))
+                .map(this::getString)
+                .collect(Collectors.toList());
     }
 
     /**

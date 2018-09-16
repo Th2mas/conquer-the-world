@@ -1,15 +1,16 @@
 package ui.menu;
 
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.error.DialogHelper;
 import util.properties.PropertiesManager;
 
-import java.util.Optional;
+import java.util.List;
 
 /**
  * The controller, which handles the top menu actions
@@ -34,8 +35,13 @@ public class MenuController {
     public Menu menuSettings;
 
     /**
-     * The language manager for setting the language in the program
-     * TODO: Move the language change to another file: This should not happen here!
+     * The language choose prompt
+     */
+    @FXML
+    public MenuItem menuItemLanguage;
+
+    /**
+     * The language manager
      */
     private PropertiesManager langManager;
 
@@ -46,27 +52,25 @@ public class MenuController {
     public void initialize(){
         LOGGER.info("Initialize");
 
-        // TODO: Remove the next line!
-        this.langManager = new PropertiesManager("properties/lang");
+        langManager = new PropertiesManager("properties/lang");
 
-
+        // Set the click listener for the 'Choose language' menu
+        menuItemLanguage.setOnAction(event -> showLanguageDialog());
     }
 
     /**
      * Opens a dialog for choosing a language, which will be used throughout the application
-     * @return language, if language was selected (clicked on ok); otherwise empty (clicked on cancel)
      */
-    public Optional<String> showLanguageDialog(){
-        Optional<String> op = Optional.empty();
+    private void showLanguageDialog(){
 
-        // TODO: Implement me!
-        //try {
-            // Load the fxml file
-            FXMLLoader loader = new FXMLLoader();
+        LOGGER.info("Show language dialog");
 
-        //}
+        String languageText = "Language";
 
-        return op;
+        List<String> languages = langManager.getAllStrings(languageText);
+
+        // TODO: Check how you can notify the main application, that the language has changed
+        DialogHelper.createChoiceDialog(languageText, languages, langManager.getBundle()).showAndWait();
     }
 
     public Parent getView(){

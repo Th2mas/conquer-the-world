@@ -1,7 +1,7 @@
 import javafx.application.Application;
 import javafx.stage.Stage;
 import ui.MainController;
-import util.error.ErrorDialog;
+import util.error.DialogHelper;
 import util.fxml.FXMLHelper;
 import util.properties.PropertiesManager;
 
@@ -45,7 +45,7 @@ public class MainApplication extends Application{
             controller.start();
 
         } catch (IOException e) {
-            ErrorDialog.showErrorDialog(e.getMessage());
+            DialogHelper.createErrorDialog(e.getMessage());
         }
     }
 
