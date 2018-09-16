@@ -23,15 +23,9 @@ public class AcquisitionPhase implements Phase {
 
     private GameController gameController;
 
-    private PropertiesManager langManager;
-
-    public AcquisitionPhase(
-            GameController gameController,
-            PropertiesManager langManager
-    ){
+    public AcquisitionPhase(GameController gameController){
         LOGGER.info("Initialize");
         this.gameController = gameController;
-        this.langManager = langManager;
     }
 
     @Override
@@ -82,7 +76,7 @@ public class AcquisitionPhase implements Phase {
 
         // Check if the phase switches to 'CONQUERING_ARMY_PLACEMENT'
         if(sumCountries == sizes) {
-            gameController.setPhase(new ArmyPlacementPhase(gameController, langManager));
+            gameController.setPhase(new ArmyPlacementPhase(gameController));
             // Set the armies for the player
             gameController.setArmies(currentPlayer);
             gameController.showArmiesLabel(currentPlayer);
@@ -108,6 +102,6 @@ public class AcquisitionPhase implements Phase {
 
     @Override
     public String toString(){
-        return langManager.getString("Game.Phase.Acquisition");
+        return PropertiesManager.getString("Game.Phase.Acquisition", "lang");
     }
 }

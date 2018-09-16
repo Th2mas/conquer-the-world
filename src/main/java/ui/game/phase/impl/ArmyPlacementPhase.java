@@ -22,15 +22,9 @@ public class ArmyPlacementPhase implements Phase {
 
     private GameController gameController;
 
-    private PropertiesManager langManager;
-
-    public ArmyPlacementPhase(
-            GameController gameController,
-            PropertiesManager langManager
-    ) {
+    public ArmyPlacementPhase(GameController gameController) {
         LOGGER.info("Initialize");
         this.gameController = gameController;
-        this.langManager = langManager;
     }
 
     @Override
@@ -47,7 +41,7 @@ public class ArmyPlacementPhase implements Phase {
         gameController.showArmiesOnCountries();
 
         // Check if the phase switches to 'CONQUERING_MOVE_AND_ATTACK'
-        if(currentPlayer.getArmies()==0) gameController.setPhase(new MoveAndAttackPhase(gameController, langManager));
+        if(currentPlayer.getArmies()==0) gameController.setPhase(new MoveAndAttackPhase(gameController));
     }
 
     @Override
@@ -67,6 +61,6 @@ public class ArmyPlacementPhase implements Phase {
 
     @Override
     public String toString() {
-        return langManager.getString("Game.Phase.ArmyPlacement");
+        return PropertiesManager.getString("Game.Phase.ArmyPlacement", "lang");
     }
 }

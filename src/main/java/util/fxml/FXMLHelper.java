@@ -20,7 +20,7 @@ public class FXMLHelper {
      * @return the loader of the file
      */
     private static FXMLLoader getFXMLLoader(String file) {
-        return getFXMLLoaderWithResources(file, (new PropertiesManager("properties/lang")).getBundle());
+        return getFXMLLoaderWithResources(file, PropertiesManager.getBundle("lang"));
     }
 
     /**
@@ -64,7 +64,7 @@ public class FXMLHelper {
      * @throws IOException will be thrown, if an exception occured
      */
     public static <T> T loadFXMLController(String file) throws IOException {
-        return loadFXMLControllerWithResources(file,(new PropertiesManager("properties/lang")).getBundle());
+        return loadFXMLControllerWithResources(file, PropertiesManager.getBundle("lang"));
     }
 
     /**

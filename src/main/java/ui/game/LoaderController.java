@@ -30,10 +30,6 @@ public class LoaderController {
      */
     private List<Continent> continentList;
 
-    private PropertiesManager customManager;
-    private PropertiesManager windowManager;
-
-
     /**
      * Creates the game controller with the default map
      */
@@ -48,11 +44,7 @@ public class LoaderController {
             throw new RuntimeException(e.getMessage());
         }
 
-        // Get the window's properties file
-        windowManager = new PropertiesManager("properties/window");
-        customManager = new PropertiesManager("properties/custom");
-
-        int width = windowManager.getInt("window.size.x");
+        int width = PropertiesManager.getInt("window.size.x", "window");
 
         // Add lines, which connect the countries with their neighbors
         continentList.forEach(continent -> continent.getCountries().forEach(country -> {
@@ -90,22 +82,22 @@ public class LoaderController {
             Color color = Color.WHITE;
             switch (continent.getName()){
                 case "North America":
-                    color = Color.valueOf(customManager.getString("Color.Continent.NorthAmerica"));
+                    color = Color.valueOf(PropertiesManager.getString("Color.Continent.NorthAmerica", "custom"));
                     break;
                 case "South America":
-                    color = Color.valueOf(customManager.getString("Color.Continent.SouthAmerica"));
+                    color = Color.valueOf(PropertiesManager.getString("Color.Continent.SouthAmerica", "custom"));
                     break;
                 case "Europe":
-                    color = Color.valueOf(customManager.getString("Color.Continent.Europe"));
+                    color = Color.valueOf(PropertiesManager.getString("Color.Continent.Europe", "custom"));
                     break;
                 case "Africa":
-                    color = Color.valueOf(customManager.getString("Color.Continent.Africa"));
+                    color = Color.valueOf(PropertiesManager.getString("Color.Continent.Africa","custom"));
                     break;
                 case "Asia":
-                    color = Color.valueOf(customManager.getString("Color.Continent.Asia"));
+                    color = Color.valueOf(PropertiesManager.getString("Color.Continent.Asia","custom"));
                     break;
                 case "Australia":
-                    color = Color.valueOf(customManager.getString("Color.Continent.Australia"));
+                    color = Color.valueOf(PropertiesManager.getString("Color.Continent.Australia","custom"));
                     break;
             }
             continent.setColor(color);

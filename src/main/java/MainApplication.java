@@ -22,14 +22,13 @@ public class MainApplication extends Application{
 
         this.primaryStage = primaryStage;
 
-        // Get the window's properties file
-        PropertiesManager windowManager = new PropertiesManager("properties/window");
+        PropertiesManager.initialize();
 
         // Set the window parameters
-        primaryStage.setWidth(windowManager.getInt("window.size.x"));
-        primaryStage.setHeight(windowManager.getInt("window.size.y"));
-        primaryStage.setTitle(windowManager.getString("window.title"));
-        primaryStage.setResizable(windowManager.getBoolean("window.resizable"));
+        primaryStage.setWidth(PropertiesManager.getInt("window.size.x", "window"));
+        primaryStage.setHeight(PropertiesManager.getInt("window.size.y", "window"));
+        primaryStage.setTitle(PropertiesManager.getString("window.title", "window"));
+        primaryStage.setResizable(PropertiesManager.getBoolean("window.resizable", "window"));
 
         initRootLayout();
     }

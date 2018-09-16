@@ -11,6 +11,7 @@ import util.error.DialogHelper;
 import util.properties.PropertiesManager;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The controller, which handles the top menu actions
@@ -41,18 +42,11 @@ public class MenuController {
     public MenuItem menuItemLanguage;
 
     /**
-     * The language manager
-     */
-    private PropertiesManager langManager;
-
-    /**
      * Initializes the controller
      */
     @FXML
     public void initialize(){
         LOGGER.info("Initialize");
-
-        langManager = new PropertiesManager("properties/lang");
 
         // Set the click listener for the 'Choose language' menu
         menuItemLanguage.setOnAction(event -> showLanguageDialog());
@@ -67,10 +61,11 @@ public class MenuController {
 
         String languageText = "Language";
 
-        List<String> languages = langManager.getAllStrings(languageText);
+        List<String> languages = PropertiesManager.getAllStrings(languageText, "settings");
 
         // TODO: Check how you can notify the main application, that the language has changed
-        DialogHelper.createChoiceDialog(languageText, languages, langManager.getBundle()).showAndWait();
+        Optional<String> result = DialogHelper.createChoiceDialog(languageText, languages, PropertiesManager.getBundle("lang")).showAndWait();
+        result.ifPresent(PropertiesManager::changeLanguage);
     }
 
     public Parent getView(){

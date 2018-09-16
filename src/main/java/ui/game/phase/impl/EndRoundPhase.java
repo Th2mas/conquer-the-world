@@ -21,15 +21,9 @@ public class EndRoundPhase implements Phase {
 
     private GameController gameController;
 
-    private PropertiesManager langManager;
-
-    public EndRoundPhase(
-            GameController gameController,
-            PropertiesManager langManager
-    ) {
+    public EndRoundPhase(GameController gameController) {
         LOGGER.info("Initialize");
         this.gameController = gameController;
-        this.langManager = langManager;
 
         // TODO: Something is not working here...
         //gameController.getPlayerService().nextTurn();
@@ -58,6 +52,6 @@ public class EndRoundPhase implements Phase {
 
     @Override
     public String toString() {
-        return langManager.getString("Game.Phase.EndRound");
+        return PropertiesManager.getString("Game.Phase.EndRound", "lang");
     }
 }

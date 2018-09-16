@@ -1,36 +1,76 @@
 package util.properties;
 
+import exceptions.LanguageNotSupportedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * A manager for a given {@code .properties} file
- * TODO: Make a static manager with a map as reference!
+ * A manager for all properties
  */
 public class PropertiesManager {
 
     /**
-     * The resource bundle for managing the file
+     * The {@link PropertiesManager} logger
      */
-    private ResourceBundle bundle;
+    private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesManager.class);
+
+    private static final List<Locale> SUPPORTED_LOCALES = Arrays.asList(
+            Locale.forLanguageTag("en"),
+            Locale.forLanguageTag("de"),
+            Locale.forLanguageTag("es"),
+            Locale.forLanguageTag("ru")
+    );
+
+    private static final List<String> SUPPORTED_BUNDLES = Arrays.asList(
+            "custom",
+            "settings",
+            "window"
+    );
 
     /**
      * The name of the file used for the ResourceBundle
      */
-    private final String bundleName;
+    private static final String LANG = "lang";
+
+    private static Locale locale = Locale.getDefault();
+
+    private static boolean isInitialized = false;
 
     /**
-     * Creates a new PropertiesManager
-     * @param name the name of the requested properties file
+     * The map for all language bundles
      */
-    public PropertiesManager(String name){
+    private static final Map<String, ResourceBundle> BUNDLES = new HashMap<>();
 
-        if(name.endsWith(".properties"))
-            name = name.substring(0, name.length()-".properties".length());
+    public static void initialize() {
+        if(!isInitialized) {
+            SUPPORTED_LOCALES.forEach(locale -> {
+                BUNDLES.put(locale.getLanguage(), ResourceBundle.getBundle("properties." + LANG, locale));
+            });
 
-        bundleName = (name.contains("/")?name.substring(name.indexOf("/")+1):name);
-        this.bundle = ResourceBundle.getBundle(name);
+            SUPPORTED_BUNDLES.forEach(bundle -> {
+                BUNDLES.put(bundle, ResourceBundle.getBundle("properties." + bundle));
+            });
+
+            isInitialized = true;
+        }
+    }
+
+    private PropertiesManager() {}
+
+    public static ResourceBundle getBundle(String name) {
+        if(name.equalsIgnoreCase("lang")) return getBundle(locale.getLanguage());
+        return BUNDLES.get(name);
+    }
+
+    private static void changeLocale(Locale locale) {
+        if (!SUPPORTED_LOCALES.contains(locale)) {
+            throw new LanguageNotSupportedException(locale.getLanguage());
+        }
+        PropertiesManager.locale = locale;
     }
 
     /**
@@ -38,20 +78,26 @@ public class PropertiesManager {
      * @param key the key to the requested value
      * @return the requested string
      */
-    public String getString(String key){
+    private static String getString(String key, ResourceBundle bundle){
         return bundle.getString(key);
     }
+
+    public static String getString(String key, String bundleName) { return getString(key, getBundle(bundleName)); }
 
     /**
      * Returns a list of strings, which start with startsWith
      * @param startsWith the string, which will be used for filtering
      * @return a list with all filtered strings
      */
-    public List<String> getAllStrings(String startsWith) {
-        return keySet().stream()
+    private static List<String> getAllStrings(String startsWith, ResourceBundle bundle) {
+        return bundle.keySet().stream()
                 .filter(s -> s.startsWith(startsWith))
-                .map(this::getString)
+                .map(s -> PropertiesManager.getString(s, bundle))
                 .collect(Collectors.toList());
+    }
+
+    public static List<String> getAllStrings(String startsWith, String bundleName) {
+        return getAllStrings(startsWith, getBundle(bundleName));
     }
 
     /**
@@ -59,72 +105,55 @@ public class PropertiesManager {
      * @param key the key to the requested value
      * @return the requested int
      */
-    public int getInt(String key){
+    private static int getInt(String key, ResourceBundle bundle){
         return Integer.parseInt(bundle.getString(key));
     }
+
+    public static int getInt(String key, String bundleName) { return getInt(key, getBundle(bundleName)); }
 
     /**
      * Returns the boolean to the given key
      * @param key the key to the requested value
      * @return the requested boolean
      */
-    public boolean getBoolean(String key){
+    private static boolean getBoolean(String key, ResourceBundle bundle){
         return Boolean.parseBoolean(bundle.getString(key));
     }
 
-    /**
-     * Change the ResourceBundles locale
-     * @param locale the locale for language support
-     */
-    public void changeLocale(Locale locale){
-        Locale loc = null;
-        for(Locale l : getSupportedLocales())
-            if(l.getLanguage().equals(locale.getLanguage()))
-                loc = l;
-        if(loc == null) loc = new Locale("en");
-        bundle = ResourceBundle.getBundle(bundleName, loc);
+    public static boolean getBoolean(String key, String bundleName) {
+        return getBoolean(key, getBundle(bundleName));
     }
 
-    /**
-     * Returns a list of supported locales
-     * @return a list of supported locales; the list is empty, if there are no files
-     */
-    public List<Locale> getSupportedLocales(){
-        List<Locale> list = new ArrayList<>();
+    public static void changeLanguage(String language) {
+        // Get the settings manager
+        ResourceBundle bundle = getBundle("settings");
 
-        File f = new File(PropertiesManager.class.getResource("/properties").getFile());
-        File[] files = f.listFiles();
+        // Check if the language is a supported language
+        if(!getAllStrings("Language", bundle).contains(language)) throw new LanguageNotSupportedException(language);
 
-        // Checks if there are any files in the Resource bundle
-        if(files == null) {
-            System.err.println("Error: \"properties\" does not exist");
-            return list;
-        }
+        // Get the language's key in the properties file (Format: 'Language.')
+        String key = getKey(language, bundle);
 
-        // Iterate over all files in the "properties" directory
-        for (File file : files){
-            String name = file.getName();
-            name = name.substring(0, name.lastIndexOf("."));
-            if(name.contains(bundleName) && name.contains("_"))
-                list.add(new Locale(name.substring(name.indexOf("_")+1)));
-        }
+        // Remove the 'Language.' and extract only the language
+        if(!key.contains(".")) return;
+        key = key.substring(key.indexOf('.'));
 
-        return list;
+        // Get the locale
+        Locale locale = Locale.forLanguageTag(getString("Locale" + key, bundle));
+
+        // Change the locale
+        changeLocale(locale);
+
+        // TODO: Notify all text objects, that the language has changed!
     }
 
-    /**
-     * Returns all keys of the {@code .properties} file
-     * @return all keys
-     */
-    public Set<String> keySet(){
-        return bundle.keySet();
-    }
+    private static String getKey(String value, ResourceBundle bundle) {
+        String key = "";
 
-    /**
-     * Returns the bundle
-     * @return bundle
-     */
-    public ResourceBundle getBundle() {
-        return bundle;
+        for(String k : bundle.keySet())
+            if(getString(k, bundle).equals(value))
+                key = k;
+
+        return key;
     }
 }

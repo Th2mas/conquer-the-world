@@ -20,11 +20,8 @@ public class SimplePlayerService implements PlayerService {
 
     private List<Player> players;
 
-    private PropertiesManager settingsManager;
-
-    public SimplePlayerService(PropertiesManager settingsManager){
+    public SimplePlayerService(){
         players = new ArrayList<>();
-        this.settingsManager = settingsManager;
     }
 
     @Override
@@ -91,9 +88,9 @@ public class SimplePlayerService implements PlayerService {
         int defendArmies;
 
         // Decide how many armies can attack the opponent
-        attackingArmies = (p1.getArmies(attackCountry) <= settingsManager.getInt("Game.MaxAttackArmies") && p1.getArmies(attackCountry) > 1)
+        attackingArmies = (p1.getArmies(attackCountry) <= PropertiesManager.getInt("Game.MaxAttackArmies", "settings") && p1.getArmies(attackCountry) > 1)
                 ? p1.getArmies(attackCountry)-1
-                : settingsManager.getInt("Game.MaxAttackArmies");
+                : PropertiesManager.getInt("Game.MaxAttackArmies", "settings");
         p1.setArmies(attackCountry, p1.getArmies(attackCountry)-attackingArmies);
 
         // Get the player, who owns the country
@@ -111,7 +108,9 @@ public class SimplePlayerService implements PlayerService {
         Player p2 = op.get();
 
         // Decide how many armies can defend the attacked country
-        defendArmies = (p2.getArmies(defendCountry) <= settingsManager.getInt("Game.MaxDefendArmies")) ? p2.getArmies(defendCountry) : settingsManager.getInt("Game.MaxDefendArmies");
+        defendArmies = (p2.getArmies(defendCountry) <= PropertiesManager.getInt("Game.MaxDefendArmies", "settings"))
+                ? p2.getArmies(defendCountry)
+                : PropertiesManager.getInt("Game.MaxDefendArmies", "settings");
         p2.setArmies(defendCountry, p2.getArmies(defendCountry)-defendArmies);
 
         // To save the thrown dices, we need to use an array
@@ -158,7 +157,7 @@ public class SimplePlayerService implements PlayerService {
         Player currentPlayer = getCurrentPlayer();
         for(int i=0; i<players.size(); i++) if(players.get(i).equals(currentPlayer)) index = i;
         if(index >= 0){
-            index = ((index+1)%players.size());
+            index = ((index+1) % players.size());
             currentPlayer.setMove(false);
             currentPlayer = players.get(index);
             currentPlayer.setMove(true);

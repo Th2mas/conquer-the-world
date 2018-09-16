@@ -29,20 +29,13 @@ public class MoveAndAttackPhase implements Phase {
 
     private GameController gameController;
 
-    private PropertiesManager langManager;
-
     private boolean drag;
 
-    public MoveAndAttackPhase(
-            GameController gameController,
-            PropertiesManager langManager
-    ) {
+    public MoveAndAttackPhase(GameController gameController) {
         LOGGER.info("Initialize");
         Objects.requireNonNull(gameController);
-        Objects.requireNonNull(langManager);
 
         this.gameController = gameController;
-        this.langManager = langManager;
         drag = false;
     }
 
@@ -123,6 +116,6 @@ public class MoveAndAttackPhase implements Phase {
 
     @Override
     public String toString() {
-        return langManager.getString("Game.Phase.MoveAndAttack");
+        return PropertiesManager.getString("Game.Phase.MoveAndAttack", "lang");
     }
 }

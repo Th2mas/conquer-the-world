@@ -22,7 +22,7 @@ public class SimplePlayerServiceTest {
 
     @Before
     public void setUp(){
-        playerService = new SimplePlayerService(new PropertiesManager("properties/settings"));
+        playerService = new SimplePlayerService();
     }
 
     @After

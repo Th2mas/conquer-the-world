@@ -85,16 +85,6 @@ public class GameController {
      */
     private StringProperty armiesProperty;
 
-    /**
-     * Handles the different languages
-     */
-    private PropertiesManager langManager;
-
-    /**
-     * Handles the different settings
-     */
-    private PropertiesManager settingsManager;
-
     private InformationController informationController;
 
     // Sets the selected country
@@ -116,14 +106,11 @@ public class GameController {
 
         continentList = loaderController.getContinentList();
 
-        langManager = new PropertiesManager("properties/lang");
-        settingsManager = new PropertiesManager("properties/settings");
-
-        currentPhase = new AcquisitionPhase(this, langManager);
+        currentPhase = new AcquisitionPhase(this);
         capitalMap = new HashMap<>();
 
         // Set a new player service
-        playerService = new SimplePlayerService(settingsManager);
+        playerService = new SimplePlayerService();
 
         // Create the capital text objects and put them into the map
         // TODO: Fix not-display bug
@@ -145,13 +132,14 @@ public class GameController {
         ai.setColor(Color.GREY);    // TODO: MOVE this to CSS
 
         // Bind the phase to the phase label
-        phaseProperty = new SimpleStringProperty(langManager.getString("Game.Phase") +": " + currentPhase);
+        phaseProperty = new SimpleStringProperty(PropertiesManager.getString("Game.Phase", "lang") +": " + currentPhase);
+
 
         // Bind the number of armies to the armies label
-        armiesProperty = new SimpleStringProperty(langManager.getString("Game.Armies") +": " + 0);
+        armiesProperty = new SimpleStringProperty(PropertiesManager.getString("Game.Armies", "lang") +": " + 0);
         player.armiesProperty().addListener(((observable, oldValue, newValue) -> {
             System.out.println("Old armies: " + oldValue + ", new armies: " + newValue);
-            armiesProperty.set(langManager.getString("Game.Armies") +": " + newValue);
+            armiesProperty.set(PropertiesManager.getString("Game.Armies", "lang") +": " + newValue);
         }));
 
         // Initialize the bottom pane
@@ -194,7 +182,7 @@ public class GameController {
         phaseProperty.addListener(((observable, oldValue, newValue) -> {
 
             Player currentPlayer = playerService.getCurrentPlayer();
-            System.out.println("Current" + langManager.getString("Game.Player") +": " + currentPlayer.getName());
+            System.out.println("Current" + PropertiesManager.getString("Game.Player", "lang") +": " + currentPlayer.getName());
 
             if(currentPlayer.isAi()){
                 while(currentPhase.getClass() == ArmyPlacementPhase.class){
@@ -209,13 +197,13 @@ public class GameController {
                             currentPhase.dragDrop(neighbor.getCapital().getX(), neighbor.getCapital().getY(), country);
                         }
                     }
-                    new EndRoundPhase(this, langManager);
+                    new EndRoundPhase(this);
                     // TODO: Fix next round phase (some stack trace...)
                 }
             }
 
             if(currentPlayer.getCountries().size() == capitalMap.keySet().size()){
-                System.out.println(langManager.getString("Game.Player") + currentPlayer.getName() + " has won!");
+                LOGGER.info(PropertiesManager.getString("Game.Player", "lang") + currentPlayer.getName() + " has won!");
             }
         }));
     }
@@ -252,7 +240,7 @@ public class GameController {
      * @param player the player which is used to display army information
      */
     public void showArmiesLabel(Player player){
-        armiesProperty.set(langManager.getString("Game.Armies") +": " + player.getArmies());
+        armiesProperty.set(PropertiesManager.getString("Game.Armies", "lang") +": " + player.getArmies());
     }
 
     /**
@@ -308,7 +296,7 @@ public class GameController {
      */
     public void setPhase(Phase phase){
         currentPhase = phase;
-        phaseProperty.set(langManager.getString("Game.Phase") +": " + phase);
+        phaseProperty.set(PropertiesManager.getString("Game.Phase", "lang") +": " + phase);
     }
 
     /**
