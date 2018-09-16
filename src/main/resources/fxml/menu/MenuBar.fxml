@@ -12,10 +12,9 @@
         stylesheets="@/css/menu_styles.css, @/css/styles.css"
 >
     <menus>
-        <Menu text="Dummy" />
         <Menu id="menuSettings" fx:id="menuSettings" mnemonicParsing="false" text="%Menu.Settings">
             <items>
-                <MenuItem text="Choose Language" />
+                <MenuItem text="%Menu.Choose.Language" />
             </items>
         </Menu>
     </menus>

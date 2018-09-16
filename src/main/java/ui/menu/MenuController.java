@@ -1,13 +1,11 @@
 package ui.menu;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
-import javafx.scene.layout.GridPane;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import util.properties.PropertiesManager;
 
 /**
@@ -16,10 +14,9 @@ import util.properties.PropertiesManager;
 public class MenuController {
 
     /**
-     * The {@link ComboBox} with all supported languages
+     * The {@link MenuController} logger
      */
-    @FXML
-    public ComboBox<String> languageChooser;
+    private static Logger LOGGER = LoggerFactory.getLogger(MenuController.class);
 
     /**
      * The pane with the top menu
@@ -33,46 +30,19 @@ public class MenuController {
     @FXML
     public Menu menuSettings;
 
+    /**
+     * The language manager for setting the language in the program
+     * TODO: Move the language change to another file: This should not happen here!
+     */
     private PropertiesManager langManager;
 
+    /**
+     * Initializes the controller
+     */
     @FXML
     public void initialize(){
+        LOGGER.info("Initialize");
         this.langManager = new PropertiesManager("properties/lang");
-        initLanguageSupport(langManager);
-    }
-
-    /**
-     * Initializes the language support
-     * It takes the supported locales and displays them in the combo box
-     * @param langManager the manager containing all values
-     */
-    private void initLanguageSupport(PropertiesManager langManager){
-
-        ObservableList<String> languages = FXCollections.observableArrayList();
-
-        langManager.getSupportedLocales().forEach(locale -> {
-            // Map the languages manually
-            // TODO: Isn't there a way to do that automatically?
-            switch (locale.getLanguage()){
-                case "de":
-                    languages.add(langManager.getString("Language.German"));
-                    break;
-                case "en":
-                    languages.add(langManager.getString("Language.English"));
-                    break;
-                case "es":
-                    languages.add(langManager.getString("Language.Spanish"));
-                    break;
-                case "ru":
-                    languages.add(langManager.getString("Language.Russian"));
-                    break;
-            }
-        });
-
-        //languageChooser.setPromptText(langManager.getString("Language.PromptText"));
-
-        //languageChooser.setItems(languages);
-        //languageChooser.setValue(languageChooser.getItems().get(0));
     }
 
     public Parent getView(){

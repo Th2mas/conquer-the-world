@@ -3,21 +3,26 @@ package ui;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ui.game.GameController;
 import ui.menu.MenuController;
 import util.properties.PropertiesManager;
 
 import java.io.IOException;
-import java.util.Locale;
 
 /**
  * The main controller for the application
  */
 public class MainController {
+
+    /**
+     * The {@link MainController} logger
+     */
+    private static Logger LOGGER = LoggerFactory.getLogger(MainController.class.getName());
 
     /**
      * The top pane for the menu
@@ -68,6 +73,8 @@ public class MainController {
     @FXML
     public void initialize(){
 
+        LOGGER.info("initialize");
+
         // Create the new language manager
         langManager = new PropertiesManager("properties/lang");
 
@@ -109,7 +116,7 @@ public class MainController {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setResources(langManager.getBundle());
-            loader.setLocation(MainController.class.getResource("/fxml/MenuBar.fxml"));
+            loader.setLocation(MainController.class.getResource("/fxml/menu/MenuBar.fxml"));
             loader.load();
 
             menuController = loader.getController();
