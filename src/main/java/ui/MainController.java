@@ -1,7 +1,6 @@
 package ui;
 
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -10,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ui.game.GameController;
 import ui.menu.MenuController;
-import util.properties.PropertiesManager;
+import util.fxml.FXMLHelper;
 
 import java.io.IOException;
 
@@ -22,7 +21,7 @@ public class MainController {
     /**
      * The {@link MainController} logger
      */
-    private static Logger LOGGER = LoggerFactory.getLogger(MainController.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MainController.class.getName());
 
     /**
      * The top pane for the menu
@@ -58,37 +57,33 @@ public class MainController {
     private MenuController menuController;
 
     /**
-     * Manages the different languages
-     */
-    private PropertiesManager langManager;
-
-    /**
-     * Manages the different settings
-     */
-    private PropertiesManager settingsManager;
-
-    /**
      * Initializes the necessities for the game
      */
     @FXML
     public void initialize(){
 
-        LOGGER.info("initialize");
-
-        // Create the new language manager
-        langManager = new PropertiesManager("properties/lang");
-
-        // Create the new settings manager
-        settingsManager = new PropertiesManager("properties/settings");
-
-        //langManager.changeLocale(Locale.ENGLISH);
+        LOGGER.info("Initialize");
 
         // Load the menu pane
-        initMenuBar();
+        try {
+            menuController = FXMLHelper.loadFXMLController("/fxml/menu/MenuBar.fxml");
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage());
+            return;
+        }
+
+        // Add the contents to the bottom
         top.getChildren().add(menuController.getView());
 
         // Load the game pane
-        initGamePane();
+        try {
+            gameController = FXMLHelper.loadFXMLController("/fxml/GamePane.fxml");
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage());
+            return;
+        }
+
+        // Add the contents to the center
         center.getChildren().add(gameController.getView());
     }
 
@@ -100,43 +95,14 @@ public class MainController {
         // Create the scene object
         Scene scene = new Scene(mainPane);
 
-        gameController.setOnKeyPressed(scene);
+        if(gameController != null)
+            gameController.setOnKeyPressed(scene);
 
         // Add the scene to the stage
         primaryStage.setScene(scene);
 
         // Show the contents
         primaryStage.show();
-    }
-
-
-
-    // TODO: Do something about the duplicate code here...
-    private void initMenuBar(){
-        try {
-            FXMLLoader loader = new FXMLLoader();
-            loader.setResources(langManager.getBundle());
-            loader.setLocation(MainController.class.getResource("/fxml/menu/MenuBar.fxml"));
-            loader.load();
-
-            menuController = loader.getController();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // TODO: Do something about the duplicate code here...
-    private void initGamePane(){
-        try {
-            FXMLLoader loader = new FXMLLoader();
-            loader.setResources(langManager.getBundle());
-            loader.setLocation(MainController.class.getResource("/fxml/GamePane.fxml"));
-            loader.load();
-
-            gameController = loader.getController();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     /**

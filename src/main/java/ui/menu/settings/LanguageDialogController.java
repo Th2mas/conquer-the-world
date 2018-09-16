@@ -14,7 +14,7 @@ public class LanguageDialogController {
     /**
      * The {@link LanguageDialogController} logger
      */
-    private static Logger LOGGER = LoggerFactory.getLogger(LanguageDialogController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LanguageDialogController.class);
 
     /**
      * The dialog's stage
@@ -26,7 +26,7 @@ public class LanguageDialogController {
      */
     @FXML
     private void initialize() {
-        LOGGER.info("initialize");
+        LOGGER.info("Initialize");
     }
 
     /**

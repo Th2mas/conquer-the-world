@@ -5,6 +5,8 @@ import dto.Country;
 import dto.Player;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.shape.Polygon;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ui.game.GameController;
 import ui.game.phase.Phase;
 import util.properties.PropertiesManager;
@@ -14,6 +16,11 @@ import util.properties.PropertiesManager;
  */
 public class AcquisitionPhase implements Phase {
 
+    /**
+     * The {@link AcquisitionPhase} logger
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(AcquisitionPhase.class);
+
     private GameController gameController;
 
     private PropertiesManager langManager;
@@ -22,6 +29,7 @@ public class AcquisitionPhase implements Phase {
             GameController gameController,
             PropertiesManager langManager
     ){
+        LOGGER.info("Initialize");
         this.gameController = gameController;
         this.langManager = langManager;
     }

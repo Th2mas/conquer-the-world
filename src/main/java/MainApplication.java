@@ -1,8 +1,8 @@
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 import ui.MainController;
 import util.error.ErrorDialog;
+import util.fxml.FXMLHelper;
 import util.properties.PropertiesManager;
 
 import java.io.IOException;
@@ -40,11 +40,7 @@ public class MainApplication extends Application{
     private void initRootLayout(){
         try {
             // Read the controller for this game
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApplication.class.getResource("/fxml/MainApplication.fxml"));
-            loader.load();
-
-            MainController controller = loader.getController();
+            MainController controller = FXMLHelper.loadFXMLController("/fxml/MainApplication.fxml");
             controller.setPrimaryStage(primaryStage);
             controller.start();
 

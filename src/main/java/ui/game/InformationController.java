@@ -5,10 +5,16 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class InformationController {
+
+    /**
+     * The {@link InformationController} logger
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(InformationController.class);
 
     @FXML
     public Label lbl_armies;
@@ -22,7 +28,7 @@ public class InformationController {
 
     @FXML
     public void initialize(){
-
+        LOGGER.info("Initialize");
     }
 
     public Label getLabelArmies() {

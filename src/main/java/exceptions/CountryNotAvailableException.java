@@ -7,9 +7,9 @@ import org.slf4j.LoggerFactory;
 
 public class CountryNotAvailableException extends Exception {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CountryNotAvailableException.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CountryNotAvailableException.class);
 
     public CountryNotAvailableException(Player player, Country country){
-        LOG.info("Country " + country.getName() + " not available. Belongs to " + player.getName());
+        LOGGER.info("Country " + country.getName() + " not available. Belongs to " + player.getName());
     }
 }

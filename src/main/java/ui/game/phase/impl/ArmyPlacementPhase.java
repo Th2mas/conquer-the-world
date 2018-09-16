@@ -4,6 +4,8 @@ import dto.Country;
 import dto.Player;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ui.game.GameController;
 import ui.game.phase.Phase;
 import util.properties.PropertiesManager;
@@ -13,6 +15,11 @@ import util.properties.PropertiesManager;
  */
 public class ArmyPlacementPhase implements Phase {
 
+    /**
+     * The {@link ArmyPlacementPhase} logger
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(ArmyPlacementPhase.class);
+
     private GameController gameController;
 
     private PropertiesManager langManager;
@@ -21,6 +28,7 @@ public class ArmyPlacementPhase implements Phase {
             GameController gameController,
             PropertiesManager langManager
     ) {
+        LOGGER.info("Initialize");
         this.gameController = gameController;
         this.langManager = langManager;
     }

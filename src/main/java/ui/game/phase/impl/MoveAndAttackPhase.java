@@ -9,6 +9,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ui.game.GameController;
 import ui.game.phase.Phase;
 import util.properties.PropertiesManager;
@@ -20,16 +22,22 @@ import java.util.Objects;
  */
 public class MoveAndAttackPhase implements Phase {
 
+    /**
+     * The {@link MoveAndAttackPhase} logger
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(MoveAndAttackPhase.class);
+
     private GameController gameController;
 
     private PropertiesManager langManager;
 
     private boolean drag;
 
-    MoveAndAttackPhase(
+    public MoveAndAttackPhase(
             GameController gameController,
             PropertiesManager langManager
     ) {
+        LOGGER.info("Initialize");
         Objects.requireNonNull(gameController);
         Objects.requireNonNull(langManager);
 

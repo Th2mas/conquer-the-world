@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class SimplePlayerService implements PlayerService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SimplePlayerService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimplePlayerService.class);
 
     private List<Player> players;
 
@@ -128,7 +128,7 @@ public class SimplePlayerService implements PlayerService {
 
         // Check which army has the highest number per dice
         for(int i=0; i<defendDices.length; i++){
-            LOG.info("Attack=[" + attackCountry.getName() + "," + attackDices[i] + "], Defend=[" + defendCountry.getName() + "," + defendDices[i] + "]");
+            LOGGER.info("Attack=[" + attackCountry.getName() + "," + attackDices[i] + "], Defend=[" + defendCountry.getName() + "," + defendDices[i] + "]");
             // If the attacking player has a larger number, the number of defending armies should be decremented
             if(attackDices[i] > defendDices[i]) defendArmies--;
             else attackingArmies--;

@@ -6,9 +6,9 @@ import org.slf4j.LoggerFactory;
 
 public class AttackOwnCountryException extends Exception {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AttackOwnCountryException.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AttackOwnCountryException.class);
 
     public AttackOwnCountryException(Player player){
-        LOG.info("Player " + player.getName() + " tries to attack himself");
+        LOGGER.info("Player " + player.getName() + " tries to attack himself");
     }
 }

@@ -4,9 +4,10 @@ import dto.Continent;
 import exceptions.IllegalCommandException;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
-import javafx.scene.Parent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import util.error.ErrorDialog;
 import util.properties.PropertiesManager;
 import util.reader.impl.SimpleMapReader;
@@ -18,6 +19,11 @@ import java.util.List;
  * The controller class for loading the continents
  */
 public class LoaderController {
+
+    /**
+     * The {@link LoaderController} logger
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoaderController.class);
 
     /**
      * The reader, which will read the .map file and return the continents

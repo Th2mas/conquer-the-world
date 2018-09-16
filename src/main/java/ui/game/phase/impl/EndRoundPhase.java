@@ -3,6 +3,8 @@ package ui.game.phase.impl;
 import dto.Country;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ui.game.GameController;
 import ui.game.phase.Phase;
 import util.properties.PropertiesManager;
@@ -12,6 +14,11 @@ import util.properties.PropertiesManager;
  */
 public class EndRoundPhase implements Phase {
 
+    /**
+     * The {@link EndRoundPhase} logger
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(EndRoundPhase.class);
+
     private GameController gameController;
 
     private PropertiesManager langManager;
@@ -20,6 +27,7 @@ public class EndRoundPhase implements Phase {
             GameController gameController,
             PropertiesManager langManager
     ) {
+        LOGGER.info("Initialize");
         this.gameController = gameController;
         this.langManager = langManager;
 

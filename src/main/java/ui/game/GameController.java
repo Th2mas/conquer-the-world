@@ -6,32 +6,39 @@ import dto.Player;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import service.PlayerService;
 import service.impl.SimplePlayerService;
-import ui.MainController;
 import ui.game.phase.Phase;
 import ui.game.phase.impl.AcquisitionPhase;
 import ui.game.phase.impl.ArmyPlacementPhase;
 import ui.game.phase.impl.EndRoundPhase;
 import ui.game.phase.impl.MoveAndAttackPhase;
+import util.fxml.FXMLHelper;
 import util.properties.PropertiesManager;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The controller, which handles the actual game logic
  */
 public class GameController {
+
+    /**
+     * The {@link GameController} logger
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(GameController.class);
 
     /**
      * Contains all continents
@@ -97,6 +104,9 @@ public class GameController {
 
     @FXML
     public void initialize(){
+
+        LOGGER.info("Initialize");
+
         // Load the game's content
         LoaderController loaderController = new LoaderController(gameGroup);
 
@@ -106,11 +116,11 @@ public class GameController {
 
         continentList = loaderController.getContinentList();
 
-        this.langManager = new PropertiesManager("properties/lang");
-        this.settingsManager = new PropertiesManager("properties/settings");
+        langManager = new PropertiesManager("properties/lang");
+        settingsManager = new PropertiesManager("properties/settings");
 
-        this.currentPhase = new AcquisitionPhase(this, langManager);
-        this.capitalMap = new HashMap<>();
+        currentPhase = new AcquisitionPhase(this, langManager);
+        capitalMap = new HashMap<>();
 
         // Set a new player service
         playerService = new SimplePlayerService(settingsManager);
@@ -145,7 +155,12 @@ public class GameController {
         }));
 
         // Initialize the bottom pane
-        initInformationPane();
+        try {
+            informationController = FXMLHelper.loadFXMLController("/fxml/InfoPane.fxml");
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage());
+            return;
+        }
 
         // Get the labels and add bind their text properties to the phase property
         gameBottom.getChildren().add(informationController.getView());
@@ -297,25 +312,11 @@ public class GameController {
     }
 
     /**
-     * Delegates key events to the current phase
+     * Delegates key events to the current phase and define what will happen on key pressed
      * @param scene the Scene object for registering the key
      */
     public void setOnKeyPressed(Scene scene){
-        // Define what will happen on key pressed
         scene.setOnKeyPressed(event -> currentPhase.setOnKeyPressed(event));
-    }
-
-    // TODO: Do something about the duplicate code here...
-    private void initInformationPane(){
-        try {
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainController.class.getResource("/fxml/InfoPane.fxml"));
-            loader.load();
-
-            informationController = loader.getController();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public Parent getView(){
