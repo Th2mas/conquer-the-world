@@ -33,7 +33,6 @@ public class AcquisitionPhase implements Phase {
 
         Player currentPlayer = gameController.getPlayerService().getCurrentPlayer();
 
-
         // Check if the country is not assigned
         if(gameController.getPlayerService().isCountryFree(country)) {
             // Add the country to the player and change its color

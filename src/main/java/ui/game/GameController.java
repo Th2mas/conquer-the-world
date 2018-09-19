@@ -51,18 +51,27 @@ public class GameController {
      */
     private Map<Country, Text> capitalMap;
 
+    /**
+     * The pane containing the game elements (containing gameBottom and gameContainer)
+     */
     @FXML
     public VBox gamePane;
 
+    /**
+     * The container for additional information, such as current phase or armies
+     */
     @FXML
     public Pane gameBottom;
 
     /**
-     * A container for the game group
+     * The container for the game group (the actual game)
      */
     @FXML
     public Pane gameContainer;
 
+    /**
+     * A group containing all game elements
+     */
     @FXML
     public Group gameGroup;
 
@@ -86,12 +95,15 @@ public class GameController {
      */
     private StringProperty armiesProperty;
 
+    /**
+     * The controller for the additional information
+     */
     private InformationController informationController;
 
-    // Sets the selected country
+    /**
+     * Sets the selected country
+     */
     private Country selectedCountry;
-
-    // TODO: Switch to Spring for Field injection! (e.g. lang-, or settingsManager)
 
     @FXML
     public void initialize(){
@@ -114,12 +126,11 @@ public class GameController {
         playerService = new SimplePlayerService();
 
         // Create the capital text objects and put them into the map
-        // TODO: Fix not-display bug
         continentList.forEach(continent -> continent.getCountries().forEach(country -> {
             Text text = new Text(country.getCapital().getX(), country.getCapital().getY(), "");
             text.setFill(Color.BLACK);
             capitalMap.put(country, text);
-            gamePane.getChildren().add(text);
+            gameGroup.getChildren().add(text);
             text.setVisible(false);
         }));
 
