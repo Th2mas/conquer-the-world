@@ -1,3 +1,4 @@
 #informationPane {
-    -fx-padding: 1em;
+    -fx-padding: 10;
+    -fx-hgap: 10;
 }

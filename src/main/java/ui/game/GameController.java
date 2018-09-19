@@ -5,6 +5,7 @@ import dto.Country;
 import dto.Player;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.Parent;
@@ -125,6 +126,17 @@ public class GameController {
         // Set a new player service
         playerService = new SimplePlayerService();
 
+        // Initialize the bottom pane
+        try {
+            informationController = FXMLHelper.loadFXMLController("/fxml/InfoPane.fxml");
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage());
+            return;
+        }
+
+        // Get the labels and bind their text properties to the respective properties
+        gameBottom.getChildren().add(informationController.getView());
+
         // Create the capital text objects and put them into the map
         continentList.forEach(continent -> continent.getCountries().forEach(country -> {
             Text text = new Text(country.getCapital().getX(), country.getCapital().getY(), "");
@@ -132,6 +144,13 @@ public class GameController {
             capitalMap.put(country, text);
             gameGroup.getChildren().add(text);
             text.setVisible(false);
+
+            // Set the hover property: If a player hovers over a country, display the name in the information pane
+            country.getPatches().forEach(
+                    patch -> patch.hoverProperty().addListener(
+                            listener -> informationController.countryTextProperty().setValue(patch.isHover() ? country.getName() : "")
+                    )
+            );
         }));
 
         // TODO Later: Request the player's name and color
@@ -154,16 +173,6 @@ public class GameController {
         player.armiesProperty().addListener((observable, oldValue, newValue) -> showArmiesLabel(player));
         PropertiesManager.addSubscriber(armiesProperty);
 
-        // Initialize the bottom pane
-        try {
-            informationController = FXMLHelper.loadFXMLController("/fxml/InfoPane.fxml");
-        } catch (IOException e) {
-            LOGGER.error(e.getMessage());
-            return;
-        }
-
-        // Get the labels and bind their text properties to the respective properties
-        gameBottom.getChildren().add(informationController.getView());
         informationController.armiesTextProperty().bindBidirectional(armiesProperty);
         informationController.phaseTextProperty().bindBidirectional(phaseProperty);
 
