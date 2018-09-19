@@ -6,19 +6,19 @@ conquer-the-world is a simple strategy game. The goal of this game is, as the na
 ## Phases
 Conquer the world consists of two phases: The acquiring and the conquering phase.
 
-###Acquiring phase
+### Acquiring phase
 Every player chooses alternately one unoccupied territory by clicking on it. (TODO: Add a picture)
 As soon as all territories are occupied, the next conquering phase starts.
 
-###Conquering phase
+### Conquering phase
 This phase consists of three sub-phases. The game will loop through those sub-phases, as soon as the acquisition phase has ended.
-####Distribute reinforcements
+#### Distribute reinforcements
 
-####Attack and move
+#### Attack and move
 By clicking on a territory, which belongs to the player, and dragging it into a country, the player either attacks an opposing country or moves his/her armies to one of his nearby territories.
 Is a player attacking a country, the player can attack at most with 3 armies. The defending player can defend at most with 2 armies. The attacking and defending is simulated by a virtual dice. TODO Add description 
 
-####End round
+#### End round
 As soon as a player has finished his/her round, the next player starts his/her round.
 The player indicates this through clicking on the 'End round' button.
 
@@ -34,7 +34,7 @@ The number of armies, the player will get additionally are described in the sect
 ### Boni
 There are some boni a player can get during the game.
 
-####Continent bonus
+#### Continent bonus
 For each conquered continent, the player gets more reinforcements next round. 
 For the classic world map, the number of reinforcements you can get per continent, are:
  * North America: 5
