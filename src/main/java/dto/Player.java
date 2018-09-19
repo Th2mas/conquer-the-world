@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * A representation for the player
@@ -49,18 +50,18 @@ public class Player {
 
     /**
      * Adds the given country to the country list and sets the number of armies for that country to 1
-     * @param c {@link Country} to be added
+     * @param country {@link Country} to be added
      */
-    public void addCountry(Country c){
-        countryMap.put(c, 1);
+    public void addCountry(Country country){
+        countryMap.put(country, 1);
     }
 
     /**
      * Removes the given country from the country list
-     * @param c {@link Country} to be removed
+     * @param country {@link Country} to be removed
      */
-    public void removeCountry(Country c){
-        countryMap.remove(c);
+    public void removeCountry(Country country){
+        countryMap.remove(country);
     }
 
     /**
@@ -73,12 +74,28 @@ public class Player {
 
     /**
      * Checks if the player's countrylist contains the given country
-     * @param c {@link Country} to be checked
+     * @param country {@link Country} to be checked
      * @return true, if the player has the country; otherwise false
      */
-    public boolean hasCountry(Country c){
-        return countryMap.containsKey(c);
+    public boolean hasCountry(Country country){
+        return countryMap.containsKey(country);
     }
+
+    /**
+     * Checks if the given player has the given continent
+     * @param continent the continent to be checked
+     * @return true, if the player has conquered the continent; false otherwise
+     */
+    public boolean hasContinent(Continent continent) {
+        boolean returnValue = true;
+        List<Country> countries = continent.getCountries();
+        for(Country country : countries) {
+            if(!hasCountry(country))
+                returnValue = false;
+        }
+        return returnValue;
+    }
+
 
     /**
      * Returns the size of the country list
@@ -145,25 +162,37 @@ public class Player {
     }
 
     /**
+     * Adds the given number of armies to the current amount
+     * @param armies number to be added
+     */
+    public void addArmies(int armies) { this.armies.set(this.armies.get()+armies); }
+
+    /**
+     * Removes the given number of armies from the current amount
+     * @param armies number to be subtracted
+     */
+    public void removeArmies(int armies) { addArmies(armies*-1);}
+
+    /**
      * Sets the number of armies for the given country
-     * @param c the {@link Country} for which the number of armies should be set
+     * @param country the {@link Country} for which the number of armies should be set
      * @param armies the number of armies to be set
      */
-    public void setArmies(Country c, int armies){
-        if(hasCountry(c)) {
-            countryMap.put(c, armies);
-            setArmies(getArmies()-getArmies(c)+armies);
+    public void setArmies(Country country, int armies){
+        if(hasCountry(country)) {
+            countryMap.put(country, armies);
+            setArmies(getArmies()-getArmies(country)+armies);
         }
     }
 
     /**
      * Increments the number of armies for the given country, if the player has the given country
      * Decrements the number of total armies, if the player has the given country
-     * @param c indicates which {@link Country} counter should be incremented
+     * @param country indicates which {@link Country} counter should be incremented
      */
-    public void placeArmies(Country c){
-        if(hasCountry(c) && getArmies() > 0){
-            countryMap.put(c, (countryMap.get(c)+1));
+    public void placeArmies(Country country){
+        if(hasCountry(country) && getArmies() > 0){
+            countryMap.put(country, (countryMap.get(country)+1));
             armies.set(armies.get()-1);
         }
     }
@@ -176,11 +205,11 @@ public class Player {
         return ai;
     }
 
-    public void setCountryMap(Map<Country, Integer> countryMap) {
+    private void setCountryMap(Map<Country, Integer> countryMap) {
         this.countryMap = countryMap;
     }
 
-    public void setAi(boolean ai) {
+    private void setAi(boolean ai) {
         this.ai = ai;
     }
 
@@ -194,11 +223,11 @@ public class Player {
 
     /**
      * Returns the number of armies for the given country
-     * @param c the country to be checked
+     * @param country the country to be checked
      * @return the number of armies for {@link Country} c
      */
-    public int getArmies(Country c){
-        return countryMap.getOrDefault(c, 0);
+    public int getArmies(Country country){
+        return countryMap.getOrDefault(country, 0);
     }
 
     @Override
@@ -214,48 +243,101 @@ public class Player {
      * A simple builder for a player
      */
     public static final class PlayerBuilder {
-        private Map<Country, Integer> countryMap;
 
-        private Color color;
+        /**
+         * The player's countries. Per default this map is empty
+         */
+        private Map<Country, Integer> countryMap = new HashMap<>();
 
-        private int armies;
+        /**
+         * The player's color, which will be used for coloring the countries. Per default this color is red
+         */
+        private Color color = Color.RED;
 
-        private String name;
+        /**
+         * The player's armies. Per default the player has no armies at the beginning
+         */
+        private int armies = 0;
 
-        private boolean ai;
+        /**
+         * The player's name. Per default this name is empty
+         */
+        private String name = "";
 
-        private boolean move;
+        /**
+         * A flag, indicating if the player is a person or just a computer. Per default the player is not a person
+         */
+        private boolean ai = false;
 
+        /**
+         * A flag, indicating if it is the player's turn to move. Per default this is false
+         */
+        private boolean move = false;
+
+        /**
+         * The setter for the player name
+         * @param name the player's name
+         * @return the builder
+         */
         public PlayerBuilder name(String name){
             this.name = name;
             return this;
         }
 
+        /**
+         * The setter for the player's armies
+         * @param armies the player's armies
+         * @return the builder
+         */
         public PlayerBuilder armies(int armies){
             this.armies = armies;
             return this;
         }
 
+        /**
+         * The setter for the player's color
+         * @param color the player's color
+         * @return the builder
+         */
         public PlayerBuilder color(Color color){
             this.color = color;
             return this;
         }
 
+        /**
+         * The setter for the flag, if the player is a computer or not
+         * @param ai the flag
+         * @return the builder
+         */
         public PlayerBuilder ai(boolean ai){
             this.ai = ai;
             return this;
         }
 
+        /**
+         * The setter for the player's country map
+         * @param countryMap the player's country map
+         * @return the builder
+         */
         public PlayerBuilder countryMap(Map<Country, Integer> countryMap){
             this.countryMap = countryMap;
             return this;
         }
 
+        /**
+         * The setter for the flag, whether it's the player's turn or not
+         * @param move the flag
+         * @return the builder
+         */
         public PlayerBuilder move(boolean move){
             this.move = move;
             return this;
         }
 
+        /**
+         * Builds the player with the current properties
+         * @return the built player
+         */
         public Player build(){
             Player player = new Player();
             player.armies = new SimpleIntegerProperty();

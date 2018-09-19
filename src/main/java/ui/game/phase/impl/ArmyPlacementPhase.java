@@ -6,6 +6,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import service.PlayerService;
+import service.impl.SimplePlayerService;
 import ui.game.GameController;
 import ui.game.phase.Phase;
 import util.properties.PropertiesManager;
@@ -22,9 +24,18 @@ public class ArmyPlacementPhase implements Phase {
 
     private GameController gameController;
 
-    public ArmyPlacementPhase(GameController gameController) {
+    ArmyPlacementPhase(GameController gameController) {
         LOGGER.info("Initialize");
         this.gameController = gameController;
+
+        PlayerService playerService = new SimplePlayerService();
+
+        Player currentPlayer = gameController.getPlayerService().getCurrentPlayer();
+        gameController.getContinentList().forEach(continent -> {
+            if(currentPlayer.hasContinent(continent)) {
+                currentPlayer.addArmies(continent.getPoints());
+            }
+        });
     }
 
     @Override

@@ -1,5 +1,6 @@
 package service.impl;
 
+import dto.Continent;
 import dto.Country;
 import dto.Player;
 import exceptions.AttackOwnCountryException;
@@ -16,10 +17,21 @@ import java.util.stream.Collectors;
 
 public class SimplePlayerService implements PlayerService {
 
+    /**
+     * The {@link SimplePlayerService} logger
+     */
     private static final Logger LOGGER = LoggerFactory.getLogger(SimplePlayerService.class);
 
+    /**
+     * The list of current players
+     */
     private List<Player> players;
 
+    // TODO: Make singleton!
+
+    /**
+     * Create a new SimplePlayerService
+     */
     public SimplePlayerService(){
         players = new ArrayList<>();
     }
@@ -34,10 +46,6 @@ public class SimplePlayerService implements PlayerService {
         Player p =  new Player.PlayerBuilder()
                 .name(name)
                 .ai(ai)
-                .color(Color.RED)
-                .armies(0)
-                .countryMap(new HashMap<>())
-                .move(false)
                 .build();
         players.add(p);
         return p;
@@ -187,6 +195,4 @@ public class SimplePlayerService implements PlayerService {
         if(currentPlayers.size() != 1) throw new IllegalStateException("There is none | more than one active players");
         return currentPlayers.get(0);
     }
-
-
 }

@@ -31,7 +31,7 @@ public class MoveAndAttackPhase implements Phase {
 
     private boolean drag;
 
-    public MoveAndAttackPhase(GameController gameController) {
+    MoveAndAttackPhase(GameController gameController) {
         LOGGER.info("Initialize");
         Objects.requireNonNull(gameController);
 
@@ -44,23 +44,7 @@ public class MoveAndAttackPhase implements Phase {
 
         // Check if the player has the country and enough armies
         // TODO make it 'glow', if the player wants to use that country for attacking
-        /*
-        if(gameController.getPlayerService().getCurrentPlayer().hasCountry(country)){
-
-            // Check if there is a selected country
-            if(gameController.getSelectedCountry() == null) {
-                gameController.selectCountry(country);
-                country.getPatches().forEach(polygon -> polygon.setFill(((Color)polygon.getFill()).darker()));
-            }
-
-            // Make the effect only, if the country hasn't already been selected
-            if(gameController.getSelectedCountry() != country) {
-                gameController.getSelectedCountry().getPatches().forEach(polygon -> polygon.setFill(((Color)polygon.getFill()).brighter()));
-                country.getPatches().forEach(polygon -> polygon.setFill(((Color)polygon.getFill()).darker()));
-                gameController.selectCountry(country);
-            }
-        }
-        */
+        // @Glow: Make it darker and brighter over time -> Maybe this will be an effect object!
     }
 
     @Override
@@ -107,7 +91,7 @@ public class MoveAndAttackPhase implements Phase {
 
         switch(event.getText().toLowerCase()){
             case "e":
-                //new EndRoundPhase(gameController);
+                new EndRoundPhase(gameController);
                 break;
             default:
                 break;

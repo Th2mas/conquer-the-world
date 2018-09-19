@@ -1,5 +1,6 @@
 package service;
 
+import dto.Continent;
 import dto.Country;
 import dto.Player;
 import exceptions.AttackOwnCountryException;
@@ -52,7 +53,7 @@ public interface PlayerService {
     /**
      * Player1 attacks the defending country
      * @param p1 the attacking player
-     * @return true, if the defending country was conquered by player1; false otherwise
+     *
      */
     void attack(Player p1, Country attackCountry, Country defendingCountry) throws NotEnoughArmiesException, AttackOwnCountryException;
 
