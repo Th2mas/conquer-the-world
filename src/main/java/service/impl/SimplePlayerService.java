@@ -6,7 +6,6 @@ import dto.Player;
 import exceptions.AttackOwnCountryException;
 import exceptions.CountryNotAvailableException;
 import exceptions.NotEnoughArmiesException;
-import javafx.scene.paint.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.PlayerService;
@@ -60,6 +59,23 @@ public class SimplePlayerService implements PlayerService {
     public void addCountry(Player player, Country country) throws CountryNotAvailableException {
         for(Player p : players) if(p.hasCountry(country)) throw new CountryNotAvailableException(p, country);
         player.addCountry(country);
+    }
+
+    @Override
+    public void setArmies(Player player, List<Continent> continents) {
+        // Get the current amount of armies
+        int armies = player.getArmies();
+
+        // Calculate the number of armies the player gets for his countries
+        armies += (player.getCountries().size() / 3);
+
+        // Calculate the additional points, if the player has conquered a continent
+        for(Continent continent : continents) {
+            if(player.hasContinent(continent)) armies += continent.getPoints();
+        }
+
+        // Set the new amount
+        player.setArmies(armies);
     }
 
     @Override

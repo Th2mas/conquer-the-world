@@ -43,6 +43,13 @@ public interface PlayerService {
     void addCountry(Player player, Country country) throws CountryNotAvailableException;
 
     /**
+     * Sets the number of armies the player can use in a round
+     * @param player the player to be used for calculation
+     * @param continents the continents in the game
+     */
+    void setArmies(Player player, List<Continent> continents);
+
+    /**
      * Moves all armies from 'from' to 'to', if both belong to the player
      * @param player the player
      * @param from the country from which the armies should be moved

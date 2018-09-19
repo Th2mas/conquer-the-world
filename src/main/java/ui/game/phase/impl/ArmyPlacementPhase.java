@@ -31,11 +31,7 @@ public class ArmyPlacementPhase implements Phase {
         PlayerService playerService = new SimplePlayerService();
 
         Player currentPlayer = gameController.getPlayerService().getCurrentPlayer();
-        gameController.getContinentList().forEach(continent -> {
-            if(currentPlayer.hasContinent(continent)) {
-                currentPlayer.addArmies(continent.getPoints());
-            }
-        });
+        playerService.setArmies(currentPlayer, gameController.getContinentList());
     }
 
     @Override

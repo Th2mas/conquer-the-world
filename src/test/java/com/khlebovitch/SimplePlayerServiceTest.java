@@ -1,5 +1,6 @@
 package com.khlebovitch;
 
+import dto.Continent;
 import dto.Country;
 import dto.Player;
 import exceptions.CountryNotAvailableException;
@@ -16,6 +17,8 @@ import service.impl.SimplePlayerService;
 import util.properties.PropertiesManager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -53,6 +56,21 @@ public class SimplePlayerServiceTest {
      */
     private List<Country> enemyCountries;
 
+    /**
+     * The list of countries, which are used for testing
+     */
+    private List<Country> countries;
+
+    /**
+     * The continent, containing all of {@link #countries} countries
+     */
+    private Continent continent;
+
+    /**
+     * The size of the custom lists in this test file
+     */
+    private int listSize = 10;
+
     @Before
     public void setUp(){
         LOGGER.info("Set up");
@@ -62,6 +80,11 @@ public class SimplePlayerServiceTest {
 
         playerCountries = player.getCountries();
         enemyCountries = enemy.getCountries();
+
+        countries = new ArrayList<>();
+        for(int i=0; i<listSize; i++) countries.add(new Country("Country"+i,new ArrayList<>(),new Point2D(0,0)));
+
+        continent = new Continent(countries, 5, "Continent1");
     }
 
     @After
@@ -88,5 +111,24 @@ public class SimplePlayerServiceTest {
 
         playerService.addCountry(player, c);
         LOGGER.info("Finished addCountry_shouldAddCountry");
+    }
+
+    @Test
+    public void setArmies_shouldSetCorrectAmountOfArmies() throws CountryNotAvailableException {
+        LOGGER.info("Enter setArmies_shouldSetCorrectAmountOfArmies");
+
+        // Get the current amount of armies
+        int prev = player.getArmies();
+
+        // Add the countries to the player
+        for(Country country : countries) playerService.addCountry(player, country);
+
+        // Set the armies for the player (including the continent)
+        playerService.setArmies(player, Collections.singletonList(continent));
+
+        // Assert, that the current armies are the previous armies plus the ones, added with the countries
+        Assert.assertEquals(prev+(listSize/3)+continent.getPoints(), player.getArmies());
+
+        LOGGER.info("Finished setArmies_shouldSetCorrectAmountOfArmies");
     }
 }

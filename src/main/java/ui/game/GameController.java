@@ -5,7 +5,6 @@ import dto.Country;
 import dto.Player;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.Parent;
@@ -233,33 +232,6 @@ public class GameController {
                 LOGGER.info(msg);
             }
         }));
-    }
-
-    /**
-     * Checks, if the given player has conquered the given continent
-     * @param player the player to be checked
-     * @param continent the continent to be checked
-     * @return true, if the player has conquered all countries of the given continent; otherwise false
-     */
-    private boolean hasContinent(Player player, Continent continent){
-        boolean check = true;
-        for(Country country : continent.getCountries())
-            if(!player.hasCountry(country)) check = false;
-        return check;
-    }
-
-    /**
-     * Sets the armies for the given player
-     * @param player the player for whom the number of armies needs to be calculated
-     */
-    public void setArmies(Player player){
-        // Set the total number of armies the players have
-        int totalArmies = player.sizeCountries();
-        for(Continent con : continentList) if(hasContinent(player, con)) totalArmies+=con.getPoints();
-
-        // Divide by three, so you get the total number of armies you can place
-        totalArmies /= 3;
-        player.setArmies(totalArmies);
     }
 
     /**
