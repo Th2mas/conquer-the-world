@@ -10,7 +10,7 @@ import java.io.IOException;
 /**
  * The main application
  */
-public class MainApplication extends Application{
+public class MainApplication extends Application {
 
     /**
      * The application's primary stage

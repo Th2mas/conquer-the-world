@@ -22,7 +22,6 @@ import ui.game.phase.impl.AcquisitionPhase;
 import ui.game.phase.impl.ArmyPlacementPhase;
 import ui.game.phase.impl.EndRoundPhase;
 import ui.game.phase.impl.MoveAndAttackPhase;
-import util.dialog.DialogHelper;
 import util.fxml.FXMLHelper;
 import util.properties.PropertiesManager;
 
@@ -203,33 +202,22 @@ public class GameController {
             Player currentPlayer = playerService.getCurrentPlayer();
             LOGGER.info("Current " + PropertiesManager.getString("Game.Player", "lang") +": " + currentPlayer.getName());
 
-            if(currentPlayer.isAi()){
-                while(currentPhase.getClass() == ArmyPlacementPhase.class){
+            if(currentPlayer.isAi()) {
+                while (currentPhase.getClass() == ArmyPlacementPhase.class) {
                     Country randomCountry = currentPlayer.getCountries().get((int) (Math.random() * currentPlayer.getCountries().size()));
                     currentPhase.click(randomCountry);
                 }
-                if(currentPhase.getClass() == MoveAndAttackPhase.class){
+                if (currentPhase.getClass() == MoveAndAttackPhase.class) {
                     List<Country> countries = currentPlayer.getCountries();
-                    for(Country country : countries){
+                    for (Country country : countries) {
                         currentPhase.dragDetect(country);
-                        for(Country neighbor : country.getNeighbors()){
+                        for (Country neighbor : country.getNeighbors()) {
                             currentPhase.dragDrop(neighbor.getCapital().getX(), neighbor.getCapital().getY(), country);
                         }
                     }
                     new EndRoundPhase(this);
                     // TODO: Fix next round phase (some stack trace...)
                 }
-            }
-
-            if(currentPlayer.getCountries().size() == capitalMap.keySet().size()){
-                String msg = String.join(" ",
-                        PropertiesManager.getString("Game.Player", "lang"),
-                        currentPlayer.getName(),
-                        PropertiesManager.getString("Dialog.Won", "lang")
-                );
-
-                DialogHelper.createInformationDialog(msg);
-                LOGGER.info(msg);
             }
         }));
     }
@@ -272,6 +260,10 @@ public class GameController {
      */
     public PlayerService getPlayerService() {
         return playerService;
+    }
+
+    public Map<Country, Text> getCapitalMap() {
+        return capitalMap;
     }
 
     /**
