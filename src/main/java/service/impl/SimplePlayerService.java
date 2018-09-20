@@ -179,7 +179,8 @@ public class SimplePlayerService implements PlayerService {
     public void nextTurn() {
         int index = -1;
         Player currentPlayer = getCurrentPlayer();
-        for(int i=0; i<players.size(); i++) if(players.get(i).equals(currentPlayer)) index = i;
+        int playersSize = players.size();
+        for(int i=0; i<playersSize; i++) if(players.get(i).equals(currentPlayer)) index = i;
         if(index >= 0){
             index = ((index+1) % players.size());
             currentPlayer.setMove(false);

@@ -73,7 +73,6 @@ public class MoveAndAttackPhase implements Phase {
             // Check if we have selected a country and if it is in our range
             if(releasedCountry != null && country.hasNeighbor(releasedCountry)) {
 
-
                 // Attack the country
                 try {
                     gameController.getPlayerService().attack(currentPlayer, gameController.getSelectedCountry(), releasedCountry);

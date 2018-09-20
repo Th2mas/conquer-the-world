@@ -22,8 +22,15 @@ public class ArmyPlacementPhase implements Phase {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(ArmyPlacementPhase.class);
 
+    /**
+     * The {@link GameController} containing game and ui relevant information
+     */
     private GameController gameController;
 
+    /**
+     * Creates a new ArmyPlacementPhase and sets the information needed for this phase
+     * @param gameController the gameController
+     */
     ArmyPlacementPhase(GameController gameController) {
         LOGGER.info("Initialize");
         this.gameController = gameController;
@@ -36,7 +43,7 @@ public class ArmyPlacementPhase implements Phase {
 
     @Override
     public void click(Country country) {
-
+        LOGGER.info("Clicked");
         Player currentPlayer = gameController.getPlayerService().getCurrentPlayer();
 
         // Increment the counter of the armies of the clicked country, if the player has the country

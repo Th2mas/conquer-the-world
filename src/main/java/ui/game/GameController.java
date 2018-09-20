@@ -156,7 +156,7 @@ public class GameController {
         Player player = playerService.createPlayer("Player", false);
         player.setMove(true);
 
-        // Create the oponents
+        // Create the opponents
         Player ai = playerService.createPlayer("Ai1", true);
         ai.setColor(Color.GREY);    // TODO: MOVE this to CSS
 
@@ -202,11 +202,21 @@ public class GameController {
             Player currentPlayer = playerService.getCurrentPlayer();
             LOGGER.info("Current " + PropertiesManager.getString("Game.Player", "lang") +": " + currentPlayer.getName());
 
+            // Define what to do, if it's the computer's turn
             if(currentPlayer.isAi()) {
-                while (currentPhase.getClass() == ArmyPlacementPhase.class) {
-                    Country randomCountry = currentPlayer.getCountries().get((int) (Math.random() * currentPlayer.getCountries().size()));
-                    currentPhase.click(randomCountry);
+                LOGGER.info("Current " + PropertiesManager.getString("Game.Player", "lang") + " isAi");
+
+                // Define what to do on ArmyPlacement
+                if (currentPhase.getClass() == ArmyPlacementPhase.class) {
+                    // TODO: Setting armies works, but the change to the next phase does not!
+                    while(currentPlayer.getArmies() > 0) {
+                        // Place armies in random countries
+                        Country randomCountry = currentPlayer.getCountries().get((int) (Math.random() * currentPlayer.getCountries().size()));
+                        currentPhase.click(randomCountry);
+                    }
                 }
+
+                // Define what to do on MoveAndAttack
                 if (currentPhase.getClass() == MoveAndAttackPhase.class) {
                     List<Country> countries = currentPlayer.getCountries();
                     for (Country country : countries) {
@@ -216,7 +226,6 @@ public class GameController {
                         }
                     }
                     new EndRoundPhase(this);
-                    // TODO: Fix next round phase (some stack trace...)
                 }
             }
         }));
