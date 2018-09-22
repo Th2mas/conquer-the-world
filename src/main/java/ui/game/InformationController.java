@@ -32,6 +32,15 @@ public class InformationController {
     public Label lbl_phase;
 
     /**
+     * The label for displaying the country name on hover
+     */
+    @FXML
+    public Label lbl_country;
+
+
+    //TODO: Add a label for displaying the current amount of conquered countries
+    //TODO: Add a label for displaying the current amount of conquered continents
+    /**
      * The main pane
      */
     @FXML
@@ -55,7 +64,7 @@ public class InformationController {
      * Get the armies property
      * @return armies text property
      */
-    public StringProperty armiesTextProperty(){
+    StringProperty armiesTextProperty(){
         return lbl_armies.textProperty();
     }
 
@@ -63,15 +72,21 @@ public class InformationController {
      * Get the phase property
      * @return phase text property
      */
-    public StringProperty phaseTextProperty(){
+    StringProperty phaseTextProperty(){
         return lbl_phase.textProperty();
     }
+
+    /**
+     * Get the country property
+     * @return country text property
+     */
+    StringProperty countryTextProperty() { return lbl_country.textProperty(); }
 
     /**
      * Get the information pane as a parent of the fxml file
      * @return informationPane
      */
-    public Parent getView(){
+    Parent getView(){
         return informationPane;
     }
 }

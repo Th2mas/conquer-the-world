@@ -1,22 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-
-
 <AnchorPane fx:id="informationPane"
             xmlns="http://javafx.com/javafx/9"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="ui.game.InformationController"
             stylesheets="@/css/info_styles.css, @/css/styles.css"
 >
-   <children>
-      <HBox fx:id="informationBox" alignment="CENTER" spacing="10">
-          <Label fx:id="lbl_armies" alignment="CENTER" contentDisplay="CENTER" />
-          <Label fx:id="lbl_phase" alignment="CENTER" contentDisplay="CENTER" GridPane.columnIndex="1" />
-      </HBox>
-       <!-- TODO: Add a label on the right hand side of the information pane for displaying the country's name onHover -->
-   </children>
+    <HBox fx:id="informationBox" alignment="CENTER" spacing="10">
+        <Label fx:id="lbl_armies" alignment="CENTER" contentDisplay="CENTER"/>
+        <Label fx:id="lbl_phase" alignment="CENTER" contentDisplay="CENTER"/>
+        <Label fx:id="lbl_country" alignment="CENTER_RIGHT" contentDisplay="CENTER"/>
+    </HBox>
 </AnchorPane>

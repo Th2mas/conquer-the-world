@@ -22,7 +22,6 @@ import ui.game.phase.impl.AcquisitionPhase;
 import ui.game.phase.impl.ArmyPlacementPhase;
 import ui.game.phase.impl.EndRoundPhase;
 import ui.game.phase.impl.MoveAndAttackPhase;
-import util.dialog.DialogHelper;
 import util.fxml.FXMLHelper;
 import util.properties.PropertiesManager;
 
@@ -51,18 +50,27 @@ public class GameController {
      */
     private Map<Country, Text> capitalMap;
 
+    /**
+     * The pane containing the game elements (containing gameBottom and gameContainer)
+     */
     @FXML
     public VBox gamePane;
 
+    /**
+     * The container for additional information, such as current phase or armies
+     */
     @FXML
     public Pane gameBottom;
 
     /**
-     * A container for the game group
+     * The container for the game group (the actual game)
      */
     @FXML
     public Pane gameContainer;
 
+    /**
+     * A group containing all game elements
+     */
     @FXML
     public Group gameGroup;
 
@@ -86,12 +94,15 @@ public class GameController {
      */
     private StringProperty armiesProperty;
 
+    /**
+     * The controller for the additional information
+     */
     private InformationController informationController;
 
-    // Sets the selected country
+    /**
+     * Sets the selected country
+     */
     private Country selectedCountry;
-
-    // TODO: Switch to Spring for Field injection! (e.g. lang-, or settingsManager)
 
     @FXML
     public void initialize(){
@@ -113,14 +124,31 @@ public class GameController {
         // Set a new player service
         playerService = new SimplePlayerService();
 
+        // Initialize the bottom pane
+        try {
+            informationController = FXMLHelper.loadFXMLController("/fxml/InfoPane.fxml");
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage());
+            return;
+        }
+
+        // Get the labels and bind their text properties to the respective properties
+        gameBottom.getChildren().add(informationController.getView());
+
         // Create the capital text objects and put them into the map
-        // TODO: Fix not-display bug
         continentList.forEach(continent -> continent.getCountries().forEach(country -> {
             Text text = new Text(country.getCapital().getX(), country.getCapital().getY(), "");
             text.setFill(Color.BLACK);
             capitalMap.put(country, text);
-            gamePane.getChildren().add(text);
+            gameGroup.getChildren().add(text);
             text.setVisible(false);
+
+            // Set the hover property: If a player hovers over a country, display the name in the information pane
+            country.getPatches().forEach(
+                    patch -> patch.hoverProperty().addListener(
+                            listener -> informationController.countryTextProperty().setValue(patch.isHover() ? country.getName() : "")
+                    )
+            );
         }));
 
         // TODO Later: Request the player's name and color
@@ -128,7 +156,7 @@ public class GameController {
         Player player = playerService.createPlayer("Player", false);
         player.setMove(true);
 
-        // Create the oponents
+        // Create the opponents
         Player ai = playerService.createPlayer("Ai1", true);
         ai.setColor(Color.GREY);    // TODO: MOVE this to CSS
 
@@ -143,16 +171,6 @@ public class GameController {
         player.armiesProperty().addListener((observable, oldValue, newValue) -> showArmiesLabel(player));
         PropertiesManager.addSubscriber(armiesProperty);
 
-        // Initialize the bottom pane
-        try {
-            informationController = FXMLHelper.loadFXMLController("/fxml/InfoPane.fxml");
-        } catch (IOException e) {
-            LOGGER.error(e.getMessage());
-            return;
-        }
-
-        // Get the labels and bind their text properties to the respective properties
-        gameBottom.getChildren().add(informationController.getView());
         informationController.armiesTextProperty().bindBidirectional(armiesProperty);
         informationController.phaseTextProperty().bindBidirectional(phaseProperty);
 
@@ -184,62 +202,32 @@ public class GameController {
             Player currentPlayer = playerService.getCurrentPlayer();
             LOGGER.info("Current " + PropertiesManager.getString("Game.Player", "lang") +": " + currentPlayer.getName());
 
-            if(currentPlayer.isAi()){
-                while(currentPhase.getClass() == ArmyPlacementPhase.class){
-                    Country randomCountry = currentPlayer.getCountries().get((int) (Math.random() * currentPlayer.getCountries().size()));
-                    currentPhase.click(randomCountry);
-                }
-                if(currentPhase.getClass() == MoveAndAttackPhase.class){
-                    List<Country> countries = currentPlayer.getCountries();
-                    for(Country country : countries){
-                        currentPhase.dragDetect(country);
-                        for(Country neighbor : country.getNeighbors()){
-                            currentPhase.dragDrop(neighbor.getCapital().getX(), neighbor.getCapital().getY(), country);
-                        }
+            // Define what to do, if it's the computer's turn
+            if(currentPlayer.isAi()) {
+                LOGGER.info("Current " + PropertiesManager.getString("Game.Player", "lang") + " isAi");
+
+                // Define what to do on ArmyPlacement
+                if (currentPhase.getClass() == ArmyPlacementPhase.class) {
+                    while(currentPlayer.getArmies() > 0) {
+                        // Place armies in random countries
+                        Country randomCountry = currentPlayer.getCountries().get((int) (Math.random() * currentPlayer.getCountries().size()));
+                        currentPhase.click(randomCountry);
                     }
-                    new EndRoundPhase(this);
-                    // TODO: Fix next round phase (some stack trace...)
                 }
-            }
 
-            if(currentPlayer.getCountries().size() == capitalMap.keySet().size()){
-                String msg = String.join(" ",
-                        PropertiesManager.getString("Game.Player", "lang"),
-                        currentPlayer.getName(),
-                        PropertiesManager.getString("Dialog.Won", "lang")
-                );
-
-                DialogHelper.createInformationDialog(msg);
-                LOGGER.info(msg);
+                // Define what to do on MoveAndAttack
+                if (currentPhase.getClass() == MoveAndAttackPhase.class) {
+                    currentPlayer.getCountries().forEach(country -> {
+                        // Detect the dragging
+                        currentPhase.dragDetect(country);
+                        country.getNeighbors().forEach(
+                                neighbor -> currentPhase.dragDrop(neighbor.getCapital().getX(), neighbor.getCapital().getY(), country)
+                        );
+                    });
+                    new EndRoundPhase(this);
+                }
             }
         }));
-    }
-
-    /**
-     * Checks, if the given player has conquered the given continent
-     * @param player the player to be checked
-     * @param continent the continent to be checked
-     * @return true, if the player has conquered all countries of the given continent; otherwise false
-     */
-    private boolean hasContinent(Player player, Continent continent){
-        boolean check = true;
-        for(Country country : continent.getCountries())
-            if(!player.hasCountry(country)) check = false;
-        return check;
-    }
-
-    /**
-     * Sets the armies for the given player
-     * @param player the player for whom the number of armies needs to be calculated
-     */
-    public void setArmies(Player player){
-        // Set the total number of armies the players have
-        int totalArmies = player.sizeCountries();
-        for(Continent con : continentList) if(hasContinent(player, con)) totalArmies+=con.getPoints();
-
-        // Divide by three, so you get the total number of armies you can place
-        totalArmies /= 3;
-        player.setArmies(totalArmies);
     }
 
     /**
@@ -280,6 +268,10 @@ public class GameController {
      */
     public PlayerService getPlayerService() {
         return playerService;
+    }
+
+    public Map<Country, Text> getCapitalMap() {
+        return capitalMap;
     }
 
     /**

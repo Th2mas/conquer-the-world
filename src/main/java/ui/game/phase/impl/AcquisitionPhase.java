@@ -7,6 +7,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.shape.Polygon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import service.PlayerService;
+import service.impl.SimplePlayerService;
 import ui.game.GameController;
 import ui.game.phase.Phase;
 import util.properties.PropertiesManager;
@@ -32,7 +34,6 @@ public class AcquisitionPhase implements Phase {
     public void click(Country country) {
 
         Player currentPlayer = gameController.getPlayerService().getCurrentPlayer();
-
 
         // Check if the country is not assigned
         if(gameController.getPlayerService().isCountryFree(country)) {
@@ -62,8 +63,6 @@ public class AcquisitionPhase implements Phase {
             currentPlayer.addCountry(randomCountry);
             for(Polygon p : randomCountry.getPatches()) p.setFill(currentPlayer.getColor());
 
-            gameController.setArmies(currentPlayer);
-
             gameController.getPlayerService().nextTurn();
             currentPlayer = gameController.getPlayerService().getCurrentPlayer();
         }
@@ -77,8 +76,6 @@ public class AcquisitionPhase implements Phase {
         // Check if the phase switches to 'CONQUERING_ARMY_PLACEMENT'
         if(sumCountries == sizes) {
             gameController.setPhase(new ArmyPlacementPhase(gameController));
-            // Set the armies for the player
-            gameController.setArmies(currentPlayer);
             gameController.showArmiesLabel(currentPlayer);
             gameController.showArmiesOnCountries();
         }

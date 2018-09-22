@@ -6,6 +6,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import service.PlayerService;
+import service.impl.SimplePlayerService;
 import ui.game.GameController;
 import ui.game.phase.Phase;
 import util.properties.PropertiesManager;
@@ -20,21 +22,35 @@ public class ArmyPlacementPhase implements Phase {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(ArmyPlacementPhase.class);
 
+    /**
+     * The {@link GameController} containing game and ui relevant information
+     */
     private GameController gameController;
 
-    public ArmyPlacementPhase(GameController gameController) {
+    /**
+     * Creates a new ArmyPlacementPhase and sets the information needed for this phase
+     * @param gameController the gameController
+     */
+    ArmyPlacementPhase(GameController gameController) {
         LOGGER.info("Initialize");
         this.gameController = gameController;
+
+        PlayerService playerService = new SimplePlayerService();
+
+        Player currentPlayer = gameController.getPlayerService().getCurrentPlayer();
+        playerService.setArmies(currentPlayer, gameController.getContinentList());
     }
 
     @Override
     public void click(Country country) {
-
+        LOGGER.info("Clicked");
         Player currentPlayer = gameController.getPlayerService().getCurrentPlayer();
 
         // Increment the counter of the armies of the clicked country, if the player has the country
         // and has enough armies to place
         currentPlayer.placeArmies(country);
+        currentPlayer.removeArmies(1);
+
         gameController.showArmiesLabel(currentPlayer);
 
         // Show the newly placed armies

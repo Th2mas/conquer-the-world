@@ -42,12 +42,12 @@ public class DialogHelper {
      * Creates an information dialog with the given information text
      * @param text the information text to be displayed
      */
-    public static void createInformationDialog(String text) {
+    public static Alert createInformationDialog(String text) {
         LOGGER.debug("Enter createInformationDialog");
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setResizable(true);
         alert.setContentText(text);
-        alert.show();
+        return alert;
     }
 
     /**
@@ -58,7 +58,7 @@ public class DialogHelper {
      * @param bundle the bundle to be used
      * @return a choice dialog
      */
-    public static ChoiceDialog<String> createChoiceDialog(String choiceText, String activeItem, List<String> choices, ResourceBundle bundle) {
+    private static ChoiceDialog<String> createChoiceDialog(String choiceText, String activeItem, List<String> choices, ResourceBundle bundle) {
         LOGGER.debug("Enter createChoiceDialog");
         ChoiceDialog<String> dialog = new ChoiceDialog<>(activeItem, choices);
 
