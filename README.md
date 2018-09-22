@@ -2,25 +2,28 @@
 
 ## Introduction 
 conquer-the-world is a simple strategy game. The goal of this game is, as the name indicates, to conquer the world. As soon as a player has conquered all territories, the game is finished.
+![Alt starting view of the conquer-the-world screen](src/main/resources/images/ctw_start.png)
 
 ## Phases
 Conquer the world consists of two phases: The acquiring and the conquering phase.
 
-### Acquiring phase
-Every player chooses alternately one unoccupied territory by clicking on it. (TODO: Add a picture)
+### Acquisition phase
+Every player chooses alternately one unoccupied territory by clicking on it.
 As soon as all territories are occupied, the next conquering phase starts.
 
 ### Conquering phase
 This phase consists of three sub-phases. The game will loop through those sub-phases, as soon as the acquisition phase has ended.
+
 #### Distribute reinforcements
+If you have enough armies, you can add an army to a country, which belongs to you. You have to use all your armies, before you can go on to the next phase. 
 
 #### Attack and move
 By clicking on a territory, which belongs to the player, and dragging it into a country, the player either attacks an opposing country or moves his/her armies to one of his nearby territories.
-Is a player attacking a country, the player can attack at most with 3 armies. The defending player can defend at most with 2 armies. The attacking and defending is simulated by a virtual dice. TODO Add description 
+Is a player attacking a country, the player can attack at most with 3 armies. The defending player can defend at most with 2 armies. The attacking and defending is simulated by a virtual dice.
 
 #### End round
 As soon as a player has finished his/her round, the next player starts his/her round.
-The player indicates this through clicking on the 'End round' button.
+The player indicates this through clicking on the 'e' key.
 
 ## Rules
 
