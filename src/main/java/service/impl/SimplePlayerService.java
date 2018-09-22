@@ -144,8 +144,11 @@ public class SimplePlayerService implements PlayerService {
         Arrays.sort(attackDices, Collections.reverseOrder());
         Arrays.sort(defendDices, Collections.reverseOrder());
 
+        // Decide how many armies can be used for checking the dices
+        int maxArmies = (attackingArmies > defendingArmies) ? defendingArmies : attackingArmies;
+
         // Check which army has the highest number per dice
-        for(int i=0; i<defendDices.length; i++){
+        for(int i=0; i<maxArmies; i++){
 
             int attackingDice = attackDices[i];
             int defendingDice = defendDices[i];
