@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * A representation for the player
@@ -165,7 +164,7 @@ public class Player {
      * Adds the given number of armies to the current amount
      * @param armies number to be added
      */
-    public void addArmies(int armies) { this.armies.set(this.armies.get()+armies); }
+    public void addArmies(int armies) { setArmies(this.armies.get()+armies); }
 
     /**
      * Removes the given number of armies from the current amount
@@ -178,11 +177,18 @@ public class Player {
      * @param country the {@link Country} for which the number of armies should be set
      * @param armies the number of armies to be set
      */
-    public void setArmies(Country country, int armies){
-        if(hasCountry(country)) {
-            countryMap.put(country, armies);
-            setArmies(getArmies()-getArmies(country)+armies);
-        }
+    public void addArmies(Country country, int armies){
+        if(hasCountry(country))
+            countryMap.put(country, (countryMap.get(country))+armies);
+    }
+
+    /**
+     * Remove the given number of armies from the given country
+     * @param country the {@link Country} from which the armies should be removed
+     * @param armies the number of armies to be removed
+     */
+    public void removeArmies(Country country, int armies) {
+        addArmies(country, armies*-1);
     }
 
     /**
@@ -191,10 +197,7 @@ public class Player {
      * @param country indicates which {@link Country} counter should be incremented
      */
     public void placeArmies(Country country){
-        if(hasCountry(country) && getArmies() > 0){
-            countryMap.put(country, (countryMap.get(country)+1));
-            armies.set(armies.get()-1);
-        }
+        addArmies(country, 1);
     }
 
     /**
@@ -205,18 +208,34 @@ public class Player {
         return ai;
     }
 
+    /**
+     * Sets the map for the player's countries
+     * @param countryMap the new map
+     */
     private void setCountryMap(Map<Country, Integer> countryMap) {
         this.countryMap = countryMap;
     }
 
+    /**
+     * Sets the flag, indicating if the player is an ai or not
+     * @param ai true, if ai; false otherwise
+     */
     private void setAi(boolean ai) {
         this.ai = ai;
     }
 
+    /**
+     * Checks, if it is the player's turn in the game
+     * @return true, if player can be moved; false otherwise
+     */
     public boolean canBeMoved() {
         return move;
     }
 
+    /**
+     * Sets the flag, indicating if the player can be moved or not
+     * @param move true, if can be moved; false otherwise
+     */
     public void setMove(boolean move) {
         this.move = move;
     }

@@ -208,7 +208,6 @@ public class GameController {
 
                 // Define what to do on ArmyPlacement
                 if (currentPhase.getClass() == ArmyPlacementPhase.class) {
-                    // TODO: Setting armies works, but the change to the next phase does not!
                     while(currentPlayer.getArmies() > 0) {
                         // Place armies in random countries
                         Country randomCountry = currentPlayer.getCountries().get((int) (Math.random() * currentPlayer.getCountries().size()));
@@ -218,13 +217,13 @@ public class GameController {
 
                 // Define what to do on MoveAndAttack
                 if (currentPhase.getClass() == MoveAndAttackPhase.class) {
-                    List<Country> countries = currentPlayer.getCountries();
-                    for (Country country : countries) {
+                    currentPlayer.getCountries().forEach(country -> {
+                        // Detect the dragging
                         currentPhase.dragDetect(country);
-                        for (Country neighbor : country.getNeighbors()) {
-                            currentPhase.dragDrop(neighbor.getCapital().getX(), neighbor.getCapital().getY(), country);
-                        }
-                    }
+                        country.getNeighbors().forEach(
+                                neighbor -> currentPhase.dragDrop(neighbor.getCapital().getX(), neighbor.getCapital().getY(), country)
+                        );
+                    });
                     new EndRoundPhase(this);
                 }
             }

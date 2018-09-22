@@ -37,6 +37,9 @@ public class InformationController {
     @FXML
     public Label lbl_country;
 
+
+    //TODO: Add a label for displaying the current amount of conquered countries
+    //TODO: Add a label for displaying the current amount of conquered continents
     /**
      * The main pane
      */

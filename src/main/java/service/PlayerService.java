@@ -65,14 +65,23 @@ public interface PlayerService {
     void attack(Player p1, Country attackCountry, Country defendingCountry) throws NotEnoughArmiesException, AttackOwnCountryException;
 
     /**
+     * Conquers the defending country and moves all left armies to that country
+     * @param p1 the player, to whom the country will belong to
+     * @param p2 the player, from whom the country will be removed
+     * @param attackCountry the attacking country
+     * @param defendingCountry the defending country
+     */
+    void conquerCountry(Player p1, Player p2, Country attackCountry, Country defendingCountry);
+
+    /**
      * Indicates the end of one players turn and lets the next player play
      */
     void nextTurn();
 
     /**
-     * Checks, if the given country belongs to a player
+     * Checks if the given country is not conquered
      * @param country the country to be checked
-     * @return true, if country does not belong to anybody; false otherwise
+     * @return true, if free; otherwise false
      */
     boolean isCountryFree(Country country);
 
@@ -81,4 +90,19 @@ public interface PlayerService {
      * @return the current player
      */
     Player getCurrentPlayer();
+
+    /**
+     * Decides how many armies can be used for attacking
+     * @param player the player used for calculation
+     * @param attackingCountry the country attacking
+     * @return the number of armies, which can be used for attacking
+     */
+    int getAttackingArmies(Player player, Country attackingCountry);
+
+    /**
+     * Decides how many armies can be used for defending
+     * @param player the player used for calculation
+     * @return the number of armies, which can be used for defending
+     */
+    int getDefendingArmies(Player player, Country defendingCountry);
 }

@@ -85,11 +85,16 @@ public class SimplePlayerService implements PlayerService {
         Objects.requireNonNull(from);
         Objects.requireNonNull(to);
 
+        // Only move armies, if player has both armies
         if(player.hasCountry(from) && player.hasCountry(to)){
-            int armies = player.getArmies(from);
-            if(armies > 1){
-                player.setArmies(to, player.getArmies(to)+(armies-1));
-                player.setArmies(from, 1);
+
+            // Get the armies to be moved
+            int armies = player.getArmies(from)-1;
+
+            // Only move, if there are any armies to be moved
+            if(armies > 0){
+                player.addArmies(to, armies);
+                player.removeArmies(from, armies);
             }
         }
     }
@@ -107,72 +112,93 @@ public class SimplePlayerService implements PlayerService {
         // If the player has not enough armies in the attacking country, then nothing should happen
         if(p1.getArmies(attackCountry) == 1) throw new NotEnoughArmiesException(p1);
 
-        // If the attacking country has n armies, you can attack only attack with at most n-1 armies
-        int attackingArmies;
-        int defendArmies;
-
-        // Decide how many armies can attack the opponent
-        attackingArmies = (p1.getArmies(attackCountry) <= PropertiesManager.getInt("Game.MaxAttackArmies", "settings") && p1.getArmies(attackCountry) > 1)
-                ? p1.getArmies(attackCountry)-1
-                : PropertiesManager.getInt("Game.MaxAttackArmies", "settings");
-        p1.setArmies(attackCountry, p1.getArmies(attackCountry)-attackingArmies);
-
         // Get the player, who owns the country
         Optional<Player> op = Optional.empty();
         for(Player player : players) if(player.hasCountry(defendCountry)) op = Optional.of(player);
 
         // If there is no player who owns the country -> illegal state
-        if(!op.isPresent()) {
-            // Reset the previous made changes
-            p1.setArmies(attackCountry, p1.getArmies(attackCountry)+attackingArmies);
+        if(!op.isPresent()) throw new IllegalStateException("No player owns country " + defendCountry.getName());
 
-            // throw exception
-            throw new IllegalStateException("No player owns country " + defendCountry.getName());
-        }
+        // Get the player the country belongs to
         Player p2 = op.get();
 
+        // If the attacking country has n armies, you can attack only attack with at most n-1 armies
+        int attackingArmies = getAttackingArmies(p1, attackCountry);
+
         // Decide how many armies can defend the attacked country
-        defendArmies = (p2.getArmies(defendCountry) <= PropertiesManager.getInt("Game.MaxDefendArmies", "settings"))
-                ? p2.getArmies(defendCountry)
-                : PropertiesManager.getInt("Game.MaxDefendArmies", "settings");
-        p2.setArmies(defendCountry, p2.getArmies(defendCountry)-defendArmies);
+        int defendingArmies = getDefendingArmies(p2, defendCountry);
+
+        // Remove the attacking and defending armies from the respective country, so that you can work with the values
+        p1.removeArmies(attackCountry, attackingArmies);
+        p2.removeArmies(defendCountry, defendingArmies);
 
         // To save the thrown dices, we need to use an array
         Integer[] attackDices = new Integer[attackingArmies];
-        Integer[] defendDices = new Integer[defendArmies];
+        Integer[] defendDices = new Integer[defendingArmies];
 
         // Calculate the thrown dices
         for(int i=0; i<attackDices.length; i++) attackDices[i] = (int) (Math.random()*6)+1;
         for(int i=0; i<defendDices.length; i++) defendDices[i] = (int) (Math.random()*6)+1;
 
-        // Sort the dice arrays in decscending order to compare the first elements
+        // Sort the dice arrays in descending order to compare the first elements
         Arrays.sort(attackDices, Collections.reverseOrder());
         Arrays.sort(defendDices, Collections.reverseOrder());
 
         // Check which army has the highest number per dice
         for(int i=0; i<defendDices.length; i++){
-            LOGGER.info("Attack=[" + attackCountry.getName() + "," + attackDices[i] + "], Defend=[" + defendCountry.getName() + "," + defendDices[i] + "]");
-            // If the attacking player has a larger number, the number of defending armies should be decremented
-            if(attackDices[i] > defendDices[i]) defendArmies--;
-            else attackingArmies--;
 
-            if(defendArmies == 0 || attackingArmies == 0) break;
+            int attackingDice = attackDices[i];
+            int defendingDice = defendDices[i];
+
+            LOGGER.info(
+                    "Attack=[" + attackCountry.getName() + "," + attackingDice + "], " +
+                    "Defend=[" + defendCountry.getName() + "," + defendingDice + "]"
+            );
+
+            // If the attacking player has a larger number, the number of defending armies should be decremented
+            if(attackingDice > defendingDice) attackingArmies--;
+            else defendingArmies--;
+
+            if(defendingArmies == 0 || attackingArmies == 0) break;
         }
 
         // If the country was conquered, remove it from the defending players list and add it to the attacking players list
-        if(defendArmies == 0){
-            p2.removeCountry(defendCountry);
-            p1.addCountry(defendCountry);
-            p1.setArmies(defendCountry, attackingArmies);
+        if(defendingArmies == 0){
+            // Add the remaining attacking armies back to the attacking country
+            p1.addArmies(attackCountry, attackingArmies);
 
-            // Change the defendCountry's color
-            defendCountry.getPatches().forEach(polygon -> polygon.setFill(p1.getColor()));
+            conquerCountry(p1, p2, attackCountry, defendCountry);
             return;
         }
 
-        // If there are still some armies left, you have to return them to their respective countries
-        p1.setArmies(attackCountry, p1.getArmies(attackCountry)+attackingArmies);
-        p2.setArmies(defendCountry, p2.getArmies(defendCountry)+defendArmies);
+        // Finally, if the country was not conquered, you have to return the armies to the respective country
+        p1.addArmies(attackCountry, attackingArmies);
+        p2.addArmies(defendCountry, defendingArmies);
+
+    }
+
+    @Override
+    public void conquerCountry(Player p1, Player p2, Country attackCountry, Country defendingCountry) {
+        // TODO: Make exceptions, if any of the conditions is false
+        // It is only possible to conquer a country, if the defending player has no armies left in the country
+        // And the attacking country has at least two armies left
+        if(p2.getArmies(defendingCountry) == 0 && p1.getArmies(attackCountry) >= 2) {
+
+            // Remove the country from the player, who has lost it
+            p2.removeCountry(defendingCountry);
+
+            // Add the country to the player, who has conquered it
+            p1.addCountry(defendingCountry);
+
+            // Remove the army from the defending country, as it will be added by 'moveArmies'
+            p1.removeArmies(defendingCountry, 1);
+
+            // Move all countries from the attacking to the defending country
+            moveArmies(p1, attackCountry, defendingCountry);
+
+            // Change the defending country's color
+            defendingCountry.getPatches().forEach(polygon -> polygon.setFill(p1.getColor()));
+        }
     }
 
     @Override
@@ -189,11 +215,46 @@ public class SimplePlayerService implements PlayerService {
         }
     }
 
-    /**
-     * Checks if the given country is not conquered
-     * @param country the country to be checked
-     * @return true, if free; otherwise false
-     */
+    @Override
+    public int getAttackingArmies(Player player, Country attackingCountry) {
+        LOGGER.info("Enter");
+
+        // Get the max attacking / defending property
+        int maxAttackingArmies = PropertiesManager.getInt("Game.MaxAttackArmies", "settings");
+
+        // Get all armies of the attacking country
+        int allCountryArmies = player.getArmies(attackingCountry);
+
+        // Decide how many armies can attack the opponent
+        // Default: 0, as there could be not enough armies in the country (e.g. the attacking country has only one army)
+        int attackingArmies = 0;
+
+        if(allCountryArmies > 1)
+            attackingArmies = (allCountryArmies > maxAttackingArmies) ? maxAttackingArmies : allCountryArmies - 1;
+
+        return attackingArmies;
+    }
+
+    @Override
+    public int getDefendingArmies(Player player, Country defendingCountry) {
+        LOGGER.info("Enter");
+
+        // Get the max attacking / defending property
+        int maxDefendingArmies = PropertiesManager.getInt("Game.MaxDefendArmies", "settings");
+
+        // Get all armies of the defending country
+        int allCountryArmies = player.getArmies(defendingCountry);
+
+        // Decide how many armies can defend the country
+        // Default: 1, as the defending country has at least one army, which must be used for defending
+        int defendingArmies = 1;
+        if(allCountryArmies > 1)
+            defendingArmies = (allCountryArmies >= maxDefendingArmies) ? maxDefendingArmies : allCountryArmies;
+
+        return defendingArmies;
+    }
+
+
     @Override
     public boolean isCountryFree(Country country) {
         boolean free = true;

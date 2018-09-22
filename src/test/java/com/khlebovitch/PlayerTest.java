@@ -39,6 +39,11 @@ public class PlayerTest {
      */
     private Continent continent;
 
+    /**
+     * The size of the custom lists in this test file
+     */
+    private int listSize = 10;
+
     @Before
     public void setUp(){
         LOGGER.info("Set up");
@@ -48,7 +53,7 @@ public class PlayerTest {
         ;
 
         countries = new ArrayList<>();
-        for(int i=0; i<10; i++) countries.add(new Country("Country"+i,new ArrayList<>(),new Point2D(0,0)));
+        for(int i=0; i<listSize; i++) countries.add(new Country("Country"+i,new ArrayList<>(),new Point2D(0,0)));
 
         continent = new Continent(countries, 5, "Continent1");
     }
@@ -145,5 +150,60 @@ public class PlayerTest {
         Assert.assertFalse(player.hasContinent(continent));
 
         LOGGER.info("Finished hasContinent_shouldReturnFalse");
+    }
+
+    @Test
+    public void setArmies_shouldSetArmiesCorrectly() {
+        LOGGER.info("Enter hasContinent_shouldReturnFalse");
+
+        // Add a country, which can be worked on
+        player.addCountry(countries.get(0));
+
+        int armiesForCountry = player.getArmies(countries.get(0));
+
+        Assert.assertEquals(1, armiesForCountry);
+
+        // Set the armies for the country
+        player.addArmies(countries.get(0), listSize);
+
+        // Now the player should have no armies left and the country should have listSize+1 countries
+        Assert.assertEquals(listSize+1, player.getArmies(countries.get(0)));
+
+        LOGGER.info("Finished hasContinent_shouldReturnFalse");
+    }
+
+    @Test
+    public void addArmies_shouldAddArmiesToCountryAndRemoveCorrectAmount() {
+        LOGGER.info("Enter addArmies_shouldAddArmiesToCountryAndRemoveCorrectAmount");
+
+        // Add the country to the player
+        player.addCountry(countries.get(0));
+
+        // Assure, that the player has no armies to be placed
+        Assert.assertEquals(0, player.getArmies());
+
+        // Assign those armies to a country
+        player.addArmies(countries.get(0), listSize);
+
+        // Assure that the player has no armies left and the country has 'listSize'+1 armies
+        Assert.assertEquals(listSize+1, player.getArmies(countries.get(0)));
+
+        LOGGER.info("Finished addArmies_shouldAddArmiesToCountryAndRemoveCorrectAmount");
+    }
+
+    @Test
+    public void addArmies_shouldAddNoArmiesAsPlayerHasNotEnoughArmies() {
+        LOGGER.info("Enter addArmies_shouldAddNoArmiesAsPlayerHasNotEnoughArmies");
+
+        // Add the country to the player
+        player.addCountry(countries.get(0));
+
+        // Assure, that the player has no armies to be placed
+        Assert.assertEquals(0, player.getArmies());
+
+        // Assure that the player has still no armies and the country has still the same amount of armies
+        Assert.assertEquals(1, player.getArmies(countries.get(0)));
+
+        LOGGER.info("Finished addArmies_shouldAddNoArmiesAsPlayerHasNotEnoughArmies");
     }
 }

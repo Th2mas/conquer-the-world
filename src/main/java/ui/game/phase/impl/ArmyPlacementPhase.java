@@ -49,6 +49,8 @@ public class ArmyPlacementPhase implements Phase {
         // Increment the counter of the armies of the clicked country, if the player has the country
         // and has enough armies to place
         currentPlayer.placeArmies(country);
+        currentPlayer.removeArmies(1);
+
         gameController.showArmiesLabel(currentPlayer);
 
         // Show the newly placed armies

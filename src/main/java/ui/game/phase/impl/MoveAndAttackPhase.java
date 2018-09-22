@@ -79,7 +79,6 @@ public class MoveAndAttackPhase implements Phase {
                 } catch (NotEnoughArmiesException e) {
                     // Do nothing, if there are not enough armies
                 } catch (AttackOwnCountryException e) {
-
                     // The attacking country is our own country, so we can move the armies
                     // TODO Optional: Let the player decide how many armies he wants to move
                     gameController.getPlayerService().moveArmies(currentPlayer, country, releasedCountry);
@@ -88,6 +87,7 @@ public class MoveAndAttackPhase implements Phase {
         }
         gameController.showArmiesOnCountries();
 
+        // Define what to do, if a player has won
         if(currentPlayer.getCountries().size() == gameController.getCapitalMap().keySet().size()){
             String msg = String.join(" ",
                     PropertiesManager.getString("Game.Player", "lang"),
