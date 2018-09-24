@@ -155,6 +155,9 @@ public class GameController {
                     )
             );
 
+            // Set the continent's locale name
+            continent.setName(PropertiesManager.getString("Continent."+continent.getBaseName().replaceAll("\\s+",""),"lang"));
+
             // Set the country's locale name
             country.setName(PropertiesManager.getString("Country."+country.getBaseName().replaceAll("\\s+",""), "lang"));
         }));
@@ -186,7 +189,9 @@ public class GameController {
 
             // Change the game values
             continentList.forEach(continent -> {
-                // TODO: Change the continent's name
+                // Change the continent's name
+                continent.setName(PropertiesManager.getString("Continent."+continent.getBaseName().replaceAll("\\s+",""),"lang"));
+
                 // Change the countries name
                 continent.getCountries().forEach(country -> country.setName(PropertiesManager.getString("Country." + country.getBaseName().replaceAll("\\s+",""),"lang")));
             });

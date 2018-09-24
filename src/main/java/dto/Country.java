@@ -44,27 +44,25 @@ public class Country {
      * @param capital the country's capital in (x,y) coordinates
      */
     public Country(String name, List<Polygon> patches, Point2D capital){
-        this(name, name, patches, capital, new ArrayList<>());
+        this(name, patches, capital, new ArrayList<>());
     }
 
     /**
      * Creates a new country
      * Parameters cannot be null
      * @param name the country's name
-     * @param baseName the country's base name
      * @param patches the country's polygons
      * @param capital the country's capital in (x,y) coordinates
      * @param neighbors the country's neighbors
      */
-    private Country(String name, String baseName, List<Polygon> patches, Point2D capital, List<Country> neighbors) {
+    private Country(String name, List<Polygon> patches, Point2D capital, List<Country> neighbors) {
         Objects.requireNonNull(name);
-        Objects.requireNonNull(baseName);
         Objects.requireNonNull(patches);
         Objects.requireNonNull(capital);
         Objects.requireNonNull(neighbors);
 
         this.name = name;
-        this.baseName = baseName;
+        this.baseName = name;
         this.patches = patches;
         this.capital = capital;
         this.neighbors = neighbors;
@@ -147,14 +145,14 @@ public class Country {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Country country = (Country) o;
-        return Objects.equals(name, country.name) &&
+        return Objects.equals(baseName, country.baseName) &&
                 Objects.equals(patches, country.patches) &&
                 Objects.equals(capital, country.capital);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, patches, capital);//, neighbors); -> recursive call...
+        return Objects.hash(baseName, patches, capital);//, neighbors); -> recursive call...
     }
 
     @Override
@@ -167,7 +165,7 @@ public class Country {
         */
 
         return "Country{" +
-                "name='" + name + '\'' +
+                "name='" + baseName + '\'' +
                 ", patches=" + patches +
                 ", capital=" + capital +
                 //", neighbors=[" + neighborsBuilder.toString() + "]" +
