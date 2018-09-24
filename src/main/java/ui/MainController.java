@@ -64,22 +64,24 @@ public class MainController {
 
         LOGGER.info("Initialize");
 
+        String file = "/fxml/menu/MenuBar.fxml";
         // Load the menu pane
         try {
-            menuController = FXMLHelper.loadFXMLController("/fxml/menu/MenuBar.fxml");
+            menuController = FXMLHelper.loadFXMLController(file);
         } catch (IOException e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error("Could not load " + file + ": " + e.getMessage());
             return;
         }
 
         // Add the contents to the bottom
         top.getChildren().add(menuController.getView());
 
+        file = "/fxml/GamePane.fxml";
         // Load the game pane
         try {
-            gameController = FXMLHelper.loadFXMLController("/fxml/GamePane.fxml");
+            gameController = FXMLHelper.loadFXMLController(file);
         } catch (IOException e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error("Could not load " + file + ": " + e.getMessage());
             return;
         }
 
