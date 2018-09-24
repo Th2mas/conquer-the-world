@@ -95,6 +95,11 @@ public class GameController {
     private StringProperty armiesProperty;
 
     /**
+     * A property, which notifies all listener, if the language property has changed
+     */
+    private StringProperty languageProperty;
+
+    /**
      * The controller for the additional information
      */
     private InformationController informationController;
@@ -149,6 +154,9 @@ public class GameController {
                             listener -> informationController.countryTextProperty().setValue(patch.isHover() ? country.getName() : "")
                     )
             );
+
+            // Set the country's locale name
+            country.setName(PropertiesManager.getString("Country."+country.getBaseName().replaceAll("\\s+",""), "lang"));
         }));
 
         // TODO Later: Request the player's name and color
@@ -170,6 +178,24 @@ public class GameController {
         armiesProperty.addListener((observable, oldValue, newValue) -> showArmiesLabel(player));
         player.armiesProperty().addListener((observable, oldValue, newValue) -> showArmiesLabel(player));
         PropertiesManager.addSubscriber(armiesProperty);
+
+        // Bind the items to the language property
+        languageProperty = new SimpleStringProperty(" ");
+        languageProperty.addListener(((observable, oldValue, newValue) -> {
+            // Define what will happen, as soon, as the language changes
+
+            // Change the game values
+            continentList.forEach(continent -> {
+                // TODO: Change the continent's name
+                // Change the countries name
+                continent.getCountries().forEach(country -> country.setName(PropertiesManager.getString("Country." + country.getBaseName().replaceAll("\\s+",""),"lang")));
+            });
+            LOGGER.info("Changed countries names");
+
+            // Set the language property to blank space, so that it can be notified again
+            languageProperty.setValue(" ");
+        }));
+        PropertiesManager.addSubscriber(languageProperty);
 
         informationController.armiesTextProperty().bindBidirectional(armiesProperty);
         informationController.phaseTextProperty().bindBidirectional(phaseProperty);

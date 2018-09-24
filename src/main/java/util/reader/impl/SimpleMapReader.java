@@ -5,6 +5,8 @@ import dto.Country;
 import exceptions.IllegalCommandException;
 import javafx.geometry.Point2D;
 import javafx.scene.shape.Polygon;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import util.reader.MapReader;
 
 import java.io.IOException;
@@ -21,6 +23,11 @@ import java.util.function.Predicate;
  * continent &lt;Cont&gt; &lt;N&gt; : &lt;T1&gt; ­ &lt;T2&gt; ­ ... &lt;Tn&gt;
  */
 public class SimpleMapReader implements MapReader {
+
+    /**
+     * The {@link SimpleMapReader} logger
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleMapReader.class);
 
     @Override
     public List<Continent> readFile(String path) throws IOException, IllegalCommandException {
@@ -131,6 +138,7 @@ public class SimpleMapReader implements MapReader {
 
         // Add the countries to their respective continent
         continentsStringList.forEach(line -> {
+
             // Split the continent with its points and the countries
             String[] sp = line.split(" : ");
 

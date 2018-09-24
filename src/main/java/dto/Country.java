@@ -15,7 +15,12 @@ public class Country {
     /**
      * The country's unique name
      */
-    private final String name;
+    private String name;
+
+    /**
+     * The country's base name (in English)
+     */
+    private final String baseName;
 
     /**
      * The list of (x,y) coordinates of the country's border
@@ -39,24 +44,27 @@ public class Country {
      * @param capital the country's capital in (x,y) coordinates
      */
     public Country(String name, List<Polygon> patches, Point2D capital){
-        this(name, patches, capital, new ArrayList<>());
+        this(name, name, patches, capital, new ArrayList<>());
     }
 
     /**
      * Creates a new country
      * Parameters cannot be null
      * @param name the country's name
+     * @param baseName the country's base name
      * @param patches the country's polygons
      * @param capital the country's capital in (x,y) coordinates
      * @param neighbors the country's neighbors
      */
-    private Country(String name, List<Polygon> patches, Point2D capital, List<Country> neighbors) {
+    private Country(String name, String baseName, List<Polygon> patches, Point2D capital, List<Country> neighbors) {
         Objects.requireNonNull(name);
+        Objects.requireNonNull(baseName);
         Objects.requireNonNull(patches);
         Objects.requireNonNull(capital);
         Objects.requireNonNull(neighbors);
 
         this.name = name;
+        this.baseName = baseName;
         this.patches = patches;
         this.capital = capital;
         this.neighbors = neighbors;
@@ -68,6 +76,20 @@ public class Country {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Sets the country's name
+     * @param name the country's name
+     */
+    public void setName(String name) {this.name = name;}
+
+    /**
+     * Gets the country's base name
+     * @return baseName
+     */
+    public String getBaseName() {
+        return baseName;
     }
 
     /**

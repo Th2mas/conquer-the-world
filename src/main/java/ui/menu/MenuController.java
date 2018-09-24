@@ -79,7 +79,7 @@ public class MenuController {
     }
 
     /**
-     * Changs the language of a menu item
+     * Changes the language of a menu item
      * @param item the menu item to be changed
      * @param key the key, which is used for finding the item's value
      */

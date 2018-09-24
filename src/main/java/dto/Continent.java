@@ -23,7 +23,7 @@ public class Continent {
     /**
      * The continent's name
      */
-    private final String name;
+    private String name;
 
     /**
      * The continent's color
@@ -101,6 +101,12 @@ public class Continent {
     public String getName() {
         return name;
     }
+
+    /**
+     * sets the continent's name
+     * @param name the continent's name
+     */
+    public void setName(String name) {this.name = name;}
 
     @Override
     public boolean equals(Object o) {
