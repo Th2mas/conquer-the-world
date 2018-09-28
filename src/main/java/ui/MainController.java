@@ -1,9 +1,10 @@
 package ui;
 
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,7 @@ public class MainController {
      * The main pane, which will contain all elements
      */
     @FXML
-    public VBox mainPane;
+    public AnchorPane mainPane;
 
     /**
      * The optional primary stage for closing the stage on close request
@@ -83,6 +84,7 @@ public class MainController {
 
         // Add the contents to the center
         center.getChildren().add(gameController.getView());
+
     }
 
     /**
@@ -95,6 +97,7 @@ public class MainController {
 
         if(gameController != null)
             gameController.setOnKeyPressed(scene);
+
 
         // Add the scene to the stage
         primaryStage.setScene(scene);

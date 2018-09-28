@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.layout.*?>
-<VBox
+<AnchorPane
         xmlns="http://javafx.com/javafx/9"
         xmlns:fx="http://javafx.com/fxml/1"
         fx:controller="ui.MainController"
         fx:id="mainPane"
-        prefWidth="1250"
-        prefHeight="800"
         stylesheets="@/css/main_styles.css, @/css/styles.css"
 >
-    <AnchorPane VBox.vgrow="ALWAYS" fx:id="top" minHeight="20.0" minWidth="0.0" />  <!-- TODO: Is there another way to get the separation? -->
-    <AnchorPane VBox.vgrow="ALWAYS" fx:id="center" minHeight="0.0" minWidth="0.0" />
-</VBox>
+    <AnchorPane fx:id="top" id="top" AnchorPane.topAnchor="0" minWidth="Infinity" prefWidth="Infinity"/>
+    <AnchorPane fx:id="center" id="center" AnchorPane.bottomAnchor="0" minWidth="Infinity" prefWidth="Infinity"/>
+</AnchorPane>

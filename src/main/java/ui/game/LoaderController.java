@@ -2,17 +2,20 @@ package ui.game;
 
 import dto.Continent;
 import exceptions.IllegalCommandException;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javafx.scene.transform.Scale;
+import javafx.scene.transform.Translate;
 import util.dialog.DialogHelper;
 import util.properties.PropertiesManager;
 import util.reader.impl.SimpleMapReader;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,10 +31,10 @@ public class LoaderController {
     /**
      * Creates the game controller with the default map
      */
-    LoaderController(Group root){
+    LoaderController(Group root, String map){
 
         // Try to get the default map
-        try { continentList = new SimpleMapReader().readFile(LoaderController.class.getResource("/map/world.map").getPath()); }
+        try { continentList = new SimpleMapReader().readFile(LoaderController.class.getResource(map).getPath()); }
         catch (IOException | IllegalCommandException e) {
             DialogHelper.createErrorDialog(e.getMessage());
             // Exit the program
@@ -39,6 +42,8 @@ public class LoaderController {
             throw new RuntimeException(e.getMessage());
         }
 
+        // TODO: Move the next part into a function, which will be called every time a resize happens
+        // TODO: Width should be current width
         int width = PropertiesManager.getInt("window.size.x", "window");
 
         // Add lines, which connect the countries with their neighbors
@@ -115,16 +120,54 @@ public class LoaderController {
 
     /**
      * Scales all patches with the given factor
-     * TODO: Doesn't scale correctly. So implement the correct scaling please!
      * @param factor scale factor
      */
-    public void scalePatches(double factor){
+    void scalePatches(double factor){
         continentList.forEach(continent -> continent.getCountries().forEach(country -> {
+
+            Translate translate = new Translate(factor, factor);
+            Scale scale = new Scale(factor, factor);
+
             country.getPatches().forEach(polygon -> {
-                polygon.setScaleX(factor);
-                polygon.setScaleY(factor);
+                // Create a list of Point2D
+                List<Point2D> points = new ArrayList<>();
+                List<Point2D> outPoints = new ArrayList<>();
+                ObservableList<Double> doubles = polygon.getPoints();
+                ObservableList<Double> outDoubles = FXCollections.observableArrayList();
+
+                // Set the points
+                for(int i=0; i<doubles.size(); i+=2) points.add(new Point2D(doubles.get(i), doubles.get(i+1)));
+
+                points.forEach(point2D -> {
+
+                    // Translate every point to its new position
+                    Point2D newPoint = translate.transform(point2D);
+
+                    // Scale every point
+                    newPoint = scale.transform(newPoint);
+
+                    // Save the points in the polygon
+                    outPoints.add(newPoint);
+                });
+
+                outPoints.forEach(point2D -> {
+                    outDoubles.add(point2D.getX());
+                    outDoubles.add(point2D.getY());
+                });
+
+                // Clear the list of polygons and add the newly calculated polygons
+                polygon.getPoints().clear();
+                polygon.getPoints().addAll(outDoubles);
             });
-            country.setCapital(new Point2D(country.getCapital().getX()*factor, country.getCapital().getY()*factor));
+
+            // Resize the position of the capital
+            // Get current position
+            Point2D capital = country.getCapital();
+            capital = translate.transform(capital);
+            capital = scale.transform(capital);
+
+            // Translate the position
+            country.setCapital(capital);
         }));
     }
 
@@ -135,5 +178,4 @@ public class LoaderController {
     List<Continent> getContinentList(){
         return continentList;
     }
-
 }

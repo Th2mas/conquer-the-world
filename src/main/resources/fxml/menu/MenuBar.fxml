@@ -11,7 +11,7 @@
         fx:controller="ui.menu.MenuController"
         stylesheets="@/css/menu_styles.css, @/css/styles.css"
 >
-    <Menu id="menuSettings" fx:id="menuSettings" mnemonicParsing="false" text="%Menu.Settings">
-        <MenuItem fx:id="menuItemLanguage" text="%Dialog.Title.Language"/>
+    <Menu styleClass="menu" fx:id="menuSettings" mnemonicParsing="false" text="%Menu.Settings">
+        <MenuItem styleClass="menuItem" fx:id="menuItemLanguage" text="%Dialog.Title.Language"/>
     </Menu>
 </MenuBar>

@@ -25,7 +25,7 @@ public class Country {
     /**
      * The list of (x,y) coordinates of the country's border
      */
-    private final List<Polygon> patches;
+    private List<Polygon> patches;
 
     /**
      * The (x,y) coordinate of the country's capital
@@ -96,6 +96,10 @@ public class Country {
      */
     public List<Polygon> getPatches() {
         return patches;
+    }
+
+    public void setPatches(List<Polygon> patches) {
+        this.patches = patches;
     }
 
     /**

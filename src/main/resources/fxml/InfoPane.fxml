@@ -9,10 +9,11 @@
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="ui.game.InformationController"
             stylesheets="@/css/info_styles.css, @/css/styles.css"
+            maxHeight="50.0"
 >
     <HBox fx:id="informationBox" alignment="CENTER" spacing="10">
-        <Label fx:id="lbl_armies" alignment="CENTER" contentDisplay="CENTER"/>
-        <Label fx:id="lbl_phase" alignment="CENTER" contentDisplay="CENTER"/>
-        <Label fx:id="lbl_country" alignment="CENTER_RIGHT" contentDisplay="CENTER"/>
+        <Label fx:id="lbl_armies" alignment="CENTER" />
+        <Label fx:id="lbl_phase" alignment="CENTER" />
+        <Label fx:id="lbl_country" alignment="CENTER_RIGHT"/>
     </HBox>
 </AnchorPane>

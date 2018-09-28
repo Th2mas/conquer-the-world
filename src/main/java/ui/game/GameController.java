@@ -6,11 +6,11 @@ import dto.Player;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import org.slf4j.Logger;
@@ -54,7 +54,7 @@ public class GameController {
      * The pane containing the game elements (containing gameBottom and gameContainer)
      */
     @FXML
-    public VBox gamePane;
+    public BorderPane gamePane;
 
     /**
      * The container for additional information, such as current phase or armies
@@ -115,7 +115,10 @@ public class GameController {
         LOGGER.info("Initialize");
 
         // Load the game's content
-        LoaderController loaderController = new LoaderController(gameGroup);
+        LoaderController loaderController = new LoaderController(gameGroup, "/map/world.map");      // TODO: Let the user decide which map to use!
+
+        // Scale the patches according to the stage size and only if it is allowed
+        loaderController.scalePatches(1.5);
 
         // TODO Optional: Maybe toggle colors?
         loaderController.setColors();

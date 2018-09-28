@@ -208,7 +208,6 @@ public class SimpleMapReader implements MapReader {
      * @return true, if the string is a number; otherwise false
      */
     private static boolean isNonNumeric(String s){
-        LOGGER.debug("isNonNumeric(" + s + ")");
         try {
             Double.parseDouble(s);
             return false;
