@@ -127,7 +127,7 @@ public class GameController {
         capitalMap = new HashMap<>();
 
         // Set a new player service
-        playerService = new SimplePlayerService();
+        playerService = SimplePlayerService.getSimplePlayerService();
 
         // Initialize the bottom pane
         try {
@@ -140,21 +140,10 @@ public class GameController {
         // Get the labels and bind their text properties to the respective properties
         gameBottom.getChildren().add(informationController.getView());
 
-        // Create the capital text objects and put them into the map
+        resetCapitalText();
+
+        // Set the continent / country names
         continentList.forEach(continent -> continent.getCountries().forEach(country -> {
-            Text text = new Text(country.getCapital().getX(), country.getCapital().getY(), "");
-            text.setFill(Color.BLACK);
-            capitalMap.put(country, text);
-            gameGroup.getChildren().add(text);
-            text.setVisible(false);
-
-            // Set the hover property: If a player hovers over a country, display the name in the information pane
-            country.getPatches().forEach(
-                    patch -> patch.hoverProperty().addListener(
-                            listener -> informationController.countryTextProperty().setValue(patch.isHover() ? country.getName() : "")
-                    )
-            );
-
             // Set the continent's locale name
             continent.setName(PropertiesManager.getString("Continent."+continent.getBaseName().replaceAll("\\s+",""),"lang"));
 
@@ -303,6 +292,36 @@ public class GameController {
 
     public Map<Country, Text> getCapitalMap() {
         return capitalMap;
+    }
+
+    /**
+     * Resets the text of the capitals
+     */
+    public void resetCapitalText() {
+        LOGGER.debug("Enter resetCapitalText");
+        // Create the capital text objects and put them into the map
+        continentList.forEach(continent -> continent.getCountries().forEach(country -> {
+
+            // Check, if there is already a text
+            // If there is one, remove it
+            Text oldText = capitalMap.get(country);
+            if(oldText != null) gameGroup.getChildren().remove(oldText);
+
+            // Create a new text
+            Text text = new Text(country.getCapital().getX(), country.getCapital().getY(), "");
+            text.setFill(Color.BLACK);
+
+            capitalMap.put(country, text);
+            gameGroup.getChildren().add(text);
+            text.setVisible(false);
+
+            // Set the hover property: If a player hovers over a country, display the name in the information pane
+            country.getPatches().forEach(
+                    patch -> patch.hoverProperty().addListener(
+                            listener -> informationController.countryTextProperty().setValue(patch.isHover() ? country.getName() : "")
+                    )
+            );
+        }));
     }
 
     /**

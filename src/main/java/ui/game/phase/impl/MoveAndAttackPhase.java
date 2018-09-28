@@ -6,6 +6,8 @@ import dto.Player;
 import exceptions.AttackOwnCountryException;
 import exceptions.NotEnoughArmiesException;
 import javafx.application.Application;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -98,8 +100,21 @@ public class MoveAndAttackPhase implements Phase {
             DialogHelper.createInformationDialog(msg).showAndWait();
             LOGGER.info(msg);
 
-            // TODO: Implement dialog for asking, if you want to play a new game or exit
-            System.exit(0);
+            Alert confirmation =
+                    DialogHelper.createConfirmationDialog(PropertiesManager.getString("Dialog.Content.StartNewGame", "lang"));
+            confirmation.showAndWait().ifPresent(result -> {
+                // Decide what to do, if player clicks on ok
+                if(result == ButtonType.OK) {
+                    LOGGER.info("Player wants to start a new game");
+                    gameController.resetCapitalText();
+                    gameController.setPhase(new AcquisitionPhase(gameController));
+                }
+                // Else just finish the game
+                else {
+                    LOGGER.info("Player exits the game");
+                    System.exit(0);
+                }
+            });
         }
     }
 

@@ -26,13 +26,22 @@ public class SimplePlayerService implements PlayerService {
      */
     private List<Player> players;
 
-    // TODO: Make singleton!
+    private static SimplePlayerService simplePlayerService;
 
     /**
-     * Create a new SimplePlayerService
+     * Creates a new SimplePlayerService
      */
-    public SimplePlayerService(){
+    private SimplePlayerService(){
         players = new ArrayList<>();
+    }
+
+    /**
+     * Returns the one and only SimplePlayerService in the game
+     * @return the simple player service
+     */
+    public static SimplePlayerService getSimplePlayerService() {
+        if(simplePlayerService == null) simplePlayerService = new SimplePlayerService();
+        return simplePlayerService;
     }
 
     @Override

@@ -35,7 +35,7 @@ public class ArmyPlacementPhase implements Phase {
         LOGGER.info("Initialize");
         this.gameController = gameController;
 
-        PlayerService playerService = new SimplePlayerService();
+        PlayerService playerService = SimplePlayerService.getSimplePlayerService();
 
         Player currentPlayer = gameController.getPlayerService().getCurrentPlayer();
         playerService.setArmies(currentPlayer, gameController.getContinentList());

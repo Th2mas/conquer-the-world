@@ -101,7 +101,7 @@ public class LoaderController {
                     break;
             }
             continent.setColor(color);
-            continent.getCountries().forEach(country -> country.getPatches().forEach(polygon -> { polygon.fillProperty().set(continent.getColor()); }));
+            continent.getCountries().forEach(country -> country.getPatches().forEach(polygon -> { polygon.setFill(continent.getColor()); }));
         });
     }
 

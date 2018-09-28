@@ -25,9 +25,24 @@ public class AcquisitionPhase implements Phase {
 
     private GameController gameController;
 
+    /**
+     * Creates a new acquisition phase
+     * @param gameController the {@link GameController}, containing relevant information for this phase
+     */
     public AcquisitionPhase(GameController gameController){
         LOGGER.info("Initialize");
         this.gameController = gameController;
+
+        // Reset the game -> We need this, if the player has started a new game
+        // TODO: Maybe add a boolean to check, if this is a new game?
+
+        // Clear the country list of all players
+        SimplePlayerService.getSimplePlayerService().getPlayers().forEach(Player::clearCountryMap);
+
+        // Reset the color of the continents and their countries
+        gameController.getContinentList().forEach(continent -> continent.getCountries().forEach(country -> {
+            country.getPatches().forEach(patch -> patch.setFill(continent.getColor()));
+        }));
     }
 
     @Override

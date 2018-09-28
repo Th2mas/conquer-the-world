@@ -2,6 +2,7 @@ package util.dialog;
 
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
@@ -41,12 +42,42 @@ public class DialogHelper {
     /**
      * Creates an information dialog with the given information text
      * @param text the information text to be displayed
+     * @return the information dialog
      */
     public static Alert createInformationDialog(String text) {
         LOGGER.debug("Enter createInformationDialog");
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setResizable(true);
         alert.setContentText(text);
+        return alert;
+    }
+
+    /**
+     * Creates a confirmation dialog with the given confirmation text
+     * @param text the information text to be displayed
+     * @return the confirmation dialog
+     */
+    public static Alert createConfirmationDialog(String text) {
+        LOGGER.debug("Enter createConfirmationDialog");
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setContentText(text);
+        return alert;
+    }
+
+    /**
+     * Creates a custom confirmation dialog with the given text and several buttons
+     * @param text the text to be displayed
+     * @param buttonTypes a variable argument list of buttons
+     * @return the confirmation dialog
+     */
+    public static Alert createCustomConfirmationDialog(String text, ButtonType... buttonTypes) {
+        LOGGER.debug("Enter createCustomConfirmationDialog");
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setContentText(text);
+
+        // Set all buttons at once
+        alert.getButtonTypes().setAll(buttonTypes);
+
         return alert;
     }
 

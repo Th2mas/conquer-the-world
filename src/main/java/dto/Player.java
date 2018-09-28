@@ -64,6 +64,11 @@ public class Player {
     }
 
     /**
+     * Clears the player's map of countries
+     */
+    public void clearCountryMap() { this.countryMap = new HashMap<>();}
+
+    /**
      * Returns a list with all countries the player currently has
      * @return the country list
      */

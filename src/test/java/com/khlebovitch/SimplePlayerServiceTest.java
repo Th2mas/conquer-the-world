@@ -77,7 +77,7 @@ public class SimplePlayerServiceTest {
 
         PropertiesManager.initialize();
 
-        playerService = new SimplePlayerService();
+        playerService = SimplePlayerService.getSimplePlayerService();
         player = playerService.createPlayer("Game.Player", false);
         enemy = playerService.createPlayer("Game.Enemy", true);
 
