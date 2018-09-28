@@ -159,7 +159,7 @@ public class SimplePlayerService implements PlayerService {
             );
 
             // If the attacking player has a larger number, the number of defending armies should be decremented
-            if(attackingDice > defendingDice) attackingArmies--;
+            if(attackingDice < defendingDice) attackingArmies--;
             else defendingArmies--;
 
             if(defendingArmies == 0 || attackingArmies == 0) break;

@@ -97,6 +97,8 @@ public class MoveAndAttackPhase implements Phase {
 
             DialogHelper.createInformationDialog(msg).showAndWait();
             LOGGER.info(msg);
+
+            // TODO: Implement dialog for asking, if you want to play a new game or exit
             System.exit(0);
         }
     }
