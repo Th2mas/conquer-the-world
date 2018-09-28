@@ -12,9 +12,7 @@
         stylesheets="@/css/game_styles.css, @/css/styles.css"
         >
     <AnchorPane fx:id="gameContainer" minHeight="0.0" minWidth="0.0">
-        <children>
-            <Group fx:id="gameGroup"/>
-        </children>
+        <Group fx:id="gameGroup"/>
     </AnchorPane>
     <Separator styleClass="separator"/>
     <AnchorPane fx:id="gameBottom" minHeight="0.0" minWidth="0.0" />

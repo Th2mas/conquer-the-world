@@ -283,7 +283,7 @@ public class GameController {
     }
 
     /**
-     * Returns the gamecontroller's playerservice
+     * Returns the {@link GameController}'s playerService
      * @return {@link PlayerService}
      */
     public PlayerService getPlayerService() {

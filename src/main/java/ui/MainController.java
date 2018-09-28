@@ -52,11 +52,6 @@ public class MainController {
     private GameController gameController;
 
     /**
-     * The controller for the top menu
-     */
-    private MenuController menuController;
-
-    /**
      * Initializes the necessities for the game
      */
     @FXML
@@ -65,7 +60,8 @@ public class MainController {
         LOGGER.info("Initialize");
 
         String file = "/fxml/menu/MenuBar.fxml";
-        // Load the menu pane
+        // Load the menu pane (the controller for the top menu)
+        MenuController menuController;
         try {
             menuController = FXMLHelper.loadFXMLController(file);
         } catch (IOException e) {

@@ -1,13 +1,11 @@
 package util.properties;
 
 import exceptions.LanguageNotSupportedException;
-import javafx.beans.property.Property;
 import javafx.beans.property.StringProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.Flow;
 import java.util.stream.Collectors;
 
 /**
@@ -44,9 +42,7 @@ public class PropertiesManager {
     /**
      * The list of supported bundles with different languages
      */
-    private static final List<String> SUPPORTED_LANGUAGE_BUNDLES = Arrays.asList(
-            "lang"
-    );
+    private static final List<String> SUPPORTED_LANGUAGE_BUNDLES = Collections.singletonList("lang");
 
     /**
      * The current locale

@@ -18,7 +18,7 @@ import java.util.function.Predicate;
 /**
  * A simple map reader, which reads a map file with the following format:
  * patch­of &lt;Country&gt; &lt;x0&gt; &lt;y0&gt; &lt;x1&gt; &lt;y1&gt; ... &lt;xn&gt; &lt;yn&gt;
- * captial­of &lt;Country&gt; &lt;x&gt; &lt;y&gt;
+ * capital­of &lt;Country&gt; &lt;x&gt; &lt;y&gt;
  * neighbors­of &lt;Country&gt; : &lt;T1&gt; ­ &lt;T2&gt; ­ ... &lt;Tn&gt;
  * continent &lt;Cont&gt; &lt;N&gt; : &lt;T1&gt; ­ &lt;T2&gt; ­ ... &lt;Tn&gt;
  */
@@ -31,6 +31,7 @@ public class SimpleMapReader implements MapReader {
 
     @Override
     public List<Continent> readFile(String path) throws IOException, IllegalCommandException {
+        LOGGER.info("Try to read " + path);
 
         // The list, which will contain all continents
         List<Continent> continentsList = new ArrayList<>();
@@ -89,7 +90,7 @@ public class SimpleMapReader implements MapReader {
 
             for(String s : sp){
                 // Check for the name
-                if(!isNumeric(s)) nameBuilder.append(s).append(" ");
+                if(isNonNumeric(s)) nameBuilder.append(s).append(" ");
                     // else just add the integer to the border list
                 else border.add(Integer.parseInt(s));
             }
@@ -119,7 +120,7 @@ public class SimpleMapReader implements MapReader {
 
             for(String s : sp){
                 // Check for the name
-                if(!isNumeric(s)) nameBuilder.append(s).append(" ");
+                if(isNonNumeric(s)) nameBuilder.append(s).append(" ");
                 else coords.add(Integer.parseInt(s));
             }
 
@@ -206,12 +207,13 @@ public class SimpleMapReader implements MapReader {
      * @param s the string to be checked
      * @return true, if the string is a number; otherwise false
      */
-    private static boolean isNumeric(String s){
+    private static boolean isNonNumeric(String s){
+        LOGGER.debug("isNonNumeric(" + s + ")");
         try {
             Double.parseDouble(s);
-            return true;
-        } catch(NumberFormatException e){
             return false;
+        } catch(NumberFormatException e){
+            return true;
         }
     }
 }

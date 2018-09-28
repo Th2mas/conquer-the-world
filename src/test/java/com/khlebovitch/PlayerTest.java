@@ -42,7 +42,7 @@ public class PlayerTest {
     /**
      * The size of the custom lists in this test file
      */
-    private int listSize = 10;
+    private final int listSize = 10;
 
     @Before
     public void setUp(){

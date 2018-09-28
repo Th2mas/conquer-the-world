@@ -2,7 +2,6 @@ package ui.game.phase.impl;
 
 import dto.Country;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ui.game.GameController;
@@ -19,13 +18,9 @@ public class EndRoundPhase implements Phase {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(EndRoundPhase.class);
 
-    private GameController gameController;
-
     public EndRoundPhase(GameController gameController) {
         LOGGER.info("Initialize");
-        this.gameController = gameController;
 
-        // TODO: Something is not working here...
         gameController.getPlayerService().nextTurn();
         gameController.setPhase(new ArmyPlacementPhase(gameController));
     }

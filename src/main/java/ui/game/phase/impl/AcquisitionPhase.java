@@ -7,7 +7,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.shape.Polygon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import service.PlayerService;
 import service.impl.SimplePlayerService;
 import ui.game.GameController;
 import ui.game.phase.Phase;
@@ -23,7 +22,7 @@ public class AcquisitionPhase implements Phase {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(AcquisitionPhase.class);
 
-    private GameController gameController;
+    private final GameController gameController;
 
     /**
      * Creates a new acquisition phase

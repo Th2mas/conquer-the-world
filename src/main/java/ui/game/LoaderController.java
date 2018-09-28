@@ -21,11 +21,6 @@ import java.util.List;
 public class LoaderController {
 
     /**
-     * The {@link LoaderController} logger
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoaderController.class);
-
-    /**
      * The reader, which will read the .map file and return the continents
      */
     private List<Continent> continentList;
@@ -33,7 +28,7 @@ public class LoaderController {
     /**
      * Creates the game controller with the default map
      */
-    public LoaderController(Group root){
+    LoaderController(Group root){
 
         // Try to get the default map
         try { continentList = new SimpleMapReader().readFile(LoaderController.class.getResource("/map/world.map").getPath()); }
@@ -75,9 +70,9 @@ public class LoaderController {
     /**
      * This method sets different colors for the continents
      */
-    public void setColors(){
+    void setColors(){
 
-        // If the continentlist is present, set the default colors to the continents
+        // If the continentList is present, set the default colors to the continents
         continentList.forEach(continent -> {
             Color color = Color.WHITE;
             switch (continent.getName()){
@@ -108,7 +103,7 @@ public class LoaderController {
     /**
      * This method darkens the color of the country on mouse over
      */
-    public void darkenPatchesOnMouseOver(){
+    void darkenPatchesOnMouseOver(){
         continentList.forEach(continent -> continent.getCountries().forEach(country -> {
             // Get the current active patch, thus the current country
             country.getPatches().forEach(patch -> {
@@ -120,7 +115,7 @@ public class LoaderController {
 
     /**
      * Scales all patches with the given factor
-     * TODO: Doesn't scale correctly
+     * TODO: Doesn't scale correctly. So implement the correct scaling please!
      * @param factor scale factor
      */
     public void scalePatches(double factor){
@@ -137,7 +132,7 @@ public class LoaderController {
      * Returns all continents
      * @return continents
      */
-    public List<Continent> getContinentList(){
+    List<Continent> getContinentList(){
         return continentList;
     }
 

@@ -4,7 +4,6 @@ import dto.Continent;
 import dto.Country;
 import dto.Player;
 import exceptions.CountryNotAvailableException;
-import exceptions.NotImplementedException;
 import javafx.geometry.Point2D;
 import org.junit.After;
 import org.junit.Assert;
@@ -17,7 +16,6 @@ import service.impl.SimplePlayerService;
 import util.properties.PropertiesManager;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -69,7 +67,7 @@ public class SimplePlayerServiceTest {
     /**
      * The size of the custom lists in this test file
      */
-    private int listSize = 10;
+    private final int listSize = 10;
 
     @Before
     public void setUp(){

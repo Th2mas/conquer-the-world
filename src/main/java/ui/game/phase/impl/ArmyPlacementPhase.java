@@ -3,7 +3,6 @@ package ui.game.phase.impl;
 import dto.Country;
 import dto.Player;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.PlayerService;
@@ -25,7 +24,7 @@ public class ArmyPlacementPhase implements Phase {
     /**
      * The {@link GameController} containing game and ui relevant information
      */
-    private GameController gameController;
+    private final GameController gameController;
 
     /**
      * Creates a new ArmyPlacementPhase and sets the information needed for this phase

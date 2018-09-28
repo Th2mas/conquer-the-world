@@ -77,7 +77,7 @@ public class Player {
     }
 
     /**
-     * Checks if the player's countrylist contains the given country
+     * Checks if the player's country list contains the given country
      * @param country {@link Country} to be checked
      * @return true, if the player has the country; otherwise false
      */

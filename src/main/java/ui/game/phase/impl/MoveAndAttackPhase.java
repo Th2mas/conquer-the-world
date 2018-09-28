@@ -5,12 +5,9 @@ import dto.Country;
 import dto.Player;
 import exceptions.AttackOwnCountryException;
 import exceptions.NotEnoughArmiesException;
-import javafx.application.Application;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +28,7 @@ public class MoveAndAttackPhase implements Phase {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(MoveAndAttackPhase.class);
 
-    private GameController gameController;
+    private final GameController gameController;
 
     private boolean drag;
 

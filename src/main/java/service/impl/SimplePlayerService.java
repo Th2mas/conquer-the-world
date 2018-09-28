@@ -24,8 +24,11 @@ public class SimplePlayerService implements PlayerService {
     /**
      * The list of current players
      */
-    private List<Player> players;
+    private final List<Player> players;
 
+    /**
+     * The SimplePlayerInstance, which will be used throughout the game
+     */
     private static SimplePlayerService simplePlayerService;
 
     /**

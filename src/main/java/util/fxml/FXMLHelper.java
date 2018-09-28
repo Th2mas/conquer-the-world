@@ -40,7 +40,7 @@ public class FXMLHelper {
      * Loads a fxml file
      * @param file the path of the file in the resources directory
      * @return the root object of the file
-     * @throws IOException will be thrown, if an exception occured
+     * @throws IOException will be thrown, if an exception occurred
      */
     public static Object loadFXMLFile(String file) throws IOException {
         return getFXMLLoader(file).load();
@@ -51,7 +51,7 @@ public class FXMLHelper {
      * @param file the path of the file in the resources directory
      * @param bundle the bundle, which can be used
      * @return the root object of the file
-     * @throws IOException will be thrown, if an exception occured
+     * @throws IOException will be thrown, if an exception occurred
      */
     public static Object loadFXMLFileWithResources(String file, ResourceBundle bundle) throws IOException {
         return getFXMLLoaderWithResources(file, bundle).load();
@@ -61,7 +61,7 @@ public class FXMLHelper {
      * Load the controller of the fxml file (default properties: lang)
      * @param file the path of the file in the resources directory
      * @return the controller of the fxml file
-     * @throws IOException will be thrown, if an exception occured
+     * @throws IOException will be thrown, if an exception occurred
      */
     public static <T> T loadFXMLController(String file) throws IOException {
         return loadFXMLControllerWithResources(file, PropertiesManager.getBundle("lang"));
@@ -72,7 +72,7 @@ public class FXMLHelper {
      * @param file the path of the file in the resources directory
      * @param bundle the bundle, which can be used
      * @return the controller of the fxml file
-     * @throws IOException will be thrown, if an exception occured
+     * @throws IOException will be thrown, if an exception occurred
      */
     public static <T> T loadFXMLControllerWithResources(String file, ResourceBundle bundle) throws IOException {
         FXMLLoader loader = getFXMLLoaderWithResources(file, bundle);

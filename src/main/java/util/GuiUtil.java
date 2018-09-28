@@ -1,11 +1,8 @@
 package util;
 
 import exceptions.NodeNotFoundException;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-
-import java.io.IOException;
 
 /**
  * A helper class, which provides helper functions
