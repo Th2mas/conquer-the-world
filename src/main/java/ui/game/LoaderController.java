@@ -41,7 +41,7 @@ class LoaderController {
     LoaderController(Group root, String map){
 
         // Try to get the default map
-        try { continentList = new SimpleMapReader().readFile(LoaderController.class.getResource(map).getPath()); }
+        try { continentList = new SimpleMapReader().readFile(map); }
         catch (IOException | IllegalCommandException e) {
             DialogHelper.createErrorDialog(e.getMessage());
             // Exit the program

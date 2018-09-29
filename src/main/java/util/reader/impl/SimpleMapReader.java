@@ -9,8 +9,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.reader.MapReader;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Predicate;
@@ -30,8 +34,8 @@ public class SimpleMapReader implements MapReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleMapReader.class);
 
     @Override
-    public List<Continent> readFile(String path) throws IOException, IllegalCommandException {
-        LOGGER.info("Try to read " + path);
+    public List<Continent> readFile(String relativePath) throws IOException, IllegalCommandException {
+        LOGGER.info("Try to read " + relativePath);
 
         // The list, which will contain all continents
         List<Continent> continentsList = new ArrayList<>();
@@ -53,29 +57,32 @@ public class SimpleMapReader implements MapReader {
         List<String> patchesStringList = new ArrayList<>();
         List<String> capitalStringList = new ArrayList<>();
 
+        BufferedReader reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(relativePath)));
+
         // Run through every line in the file
         // (Using a simple for loop for throwing an exception)
-        for(String line : Files.readAllLines(Paths.get(path))){
+        String sLine;
+        while((sLine = reader.readLine()) != null) {
 
             // Get the command
-            String[] sp = line.split(" ");
+            String[] sp = sLine.split(" ");
 
             // Substring the line, so you can work better with it
-            line = line.substring(sp[0].length()+1);
+            sLine = sLine.substring(sp[0].length()+1);
 
             // Delegate the command
             switch (sp[0]){
                 case "patch-of":
-                    patchesStringList.add(line);
+                    patchesStringList.add(sLine);
                     break;
                 case "capital-of":
-                    capitalStringList.add(line);
+                    capitalStringList.add(sLine);
                     break;
                 case "neighbors-of":
-                    neighborsStringList.add(line);
+                    neighborsStringList.add(sLine);
                     break;
                 case "continent":
-                    continentsStringList.add(line);
+                    continentsStringList.add(sLine);
                     break;
                 default: throw new IllegalCommandException("Command " + sp[0] + " unknown!");
             }

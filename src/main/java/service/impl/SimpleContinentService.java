@@ -14,7 +14,7 @@ import java.util.List;
 public class SimpleContinentService implements ContinentService {
     @Override
     public List<Continent> getContinents() throws IllegalCommandException, IOException {
-        return new SimpleMapReader().readFile(SimpleContinentService.class.getResource("/map/world.map").getPath());
+        return new SimpleMapReader().readFile("/map/world.map");
     }
 
 
