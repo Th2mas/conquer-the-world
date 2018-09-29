@@ -6,13 +6,13 @@ import dto.Player;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.PlayerService;
@@ -100,6 +100,11 @@ public class GameController {
     private StringProperty languageProperty;
 
     /**
+     * The controller for loading and manipulating map information
+     */
+    private LoaderController loaderController;
+
+    /**
      * The controller for the additional information
      */
     private InformationController informationController;
@@ -109,16 +114,16 @@ public class GameController {
      */
     private Country selectedCountry;
 
+    private static final int BASE_WIDTH = PropertiesManager.getInt("window.size.x","window");
+    private static final int BASE_HEIGHT = PropertiesManager.getInt("window.size.y", "window");
+
     @FXML
     public void initialize(){
 
         LOGGER.info("Initialize");
 
         // Load the game's content
-        LoaderController loaderController = new LoaderController(gameGroup, "/map/world.map");      // TODO: Let the user decide which map to use!
-
-        // Scale the patches according to the stage size and only if it is allowed
-        loaderController.scalePatches(1.5);
+        loaderController = new LoaderController(gameGroup, "/map/world.map");      // TODO: Let the user decide which map to use!
 
         // TODO Optional: Maybe toggle colors?
         loaderController.setColors();
@@ -357,6 +362,26 @@ public class GameController {
      */
     public void setOnKeyPressed(Scene scene){
         scene.setOnKeyPressed(event -> currentPhase.setOnKeyPressed(event));
+    }
+
+    /**
+     * TODO: Implement correct resizing
+     * @param oldWidth
+     * @param oldHeight
+     * @param newWidth
+     * @param newHeight
+     */
+    public void resize(double oldWidth, double oldHeight, double newWidth, double newHeight) {
+
+        // Calculate the factors
+        double factorX = newWidth / oldWidth;
+        double factorY = newHeight / oldHeight;
+
+        // Scale the patches according to the stage size and only if it is allowed
+        if(PropertiesManager.getBoolean("window.resizable","window")) {
+            loaderController.resizePatches(factorX, factorY);
+            loaderController.redrawLines(BASE_WIDTH * factorX);
+        }
     }
 
     public Parent getView(){

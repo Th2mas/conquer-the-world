@@ -1,16 +1,18 @@
 package ui;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ui.game.GameController;
 import ui.menu.MenuController;
 import util.fxml.FXMLHelper;
+import util.properties.PropertiesManager;
 
 import java.io.IOException;
 
@@ -95,12 +97,21 @@ public class MainController {
         // Create the scene object
         Scene scene = new Scene(mainPane);
 
-        if(gameController != null)
-            gameController.setOnKeyPressed(scene);
-
-
         // Add the scene to the stage
         primaryStage.setScene(scene);
+
+        if(gameController != null) {
+            // Set the game controllers on key pressed
+            gameController.setOnKeyPressed(scene);
+
+            // Bind the game controller's width and height property to the stage's width and height property
+            // TODO: Add the binding
+            if(PropertiesManager.getBoolean("window.resizable","window")) {
+                primaryStage.widthProperty().addListener((observable, oldValue, newValue) -> gameController.resize((Double)oldValue, primaryStage.getHeight(), (Double)newValue, primaryStage.getHeight()));
+                primaryStage.heightProperty().addListener((observable, oldValue, newValue) -> gameController.resize(primaryStage.getWidth(), (Double)oldValue, primaryStage.getWidth(), (Double)newValue));
+
+            }
+        }
 
         // Show the contents
         primaryStage.show();
