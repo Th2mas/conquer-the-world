@@ -9,10 +9,11 @@ import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.PlayerService;
@@ -54,7 +55,7 @@ public class GameController {
      * The pane containing the game elements (containing gameBottom and gameContainer)
      */
     @FXML
-    public BorderPane gamePane;
+    public AnchorPane gamePane;
 
     /**
      * The container for additional information, such as current phase or armies
@@ -150,6 +151,7 @@ public class GameController {
 
         resetCapitalText();
 
+        // TODO: Move this elsewhere...
         // Set the continent / country names
         continentList.forEach(continent -> continent.getCountries().forEach(country -> {
             // Set the continent's locale name
@@ -366,16 +368,15 @@ public class GameController {
 
     /**
      * TODO: Implement correct resizing
-     * @param oldWidth
-     * @param oldHeight
+     * Resizes all patches in the game -> TODO Move this method somewhere else...
      * @param newWidth
      * @param newHeight
      */
-    public void resize(double oldWidth, double oldHeight, double newWidth, double newHeight) {
+    public void resize(double newWidth, double newHeight) {
 
         // Calculate the factors
-        double factorX = newWidth / oldWidth;
-        double factorY = newHeight / oldHeight;
+        double factorX = newWidth / BASE_WIDTH;
+        double factorY = newHeight / BASE_HEIGHT;
 
         // Scale the patches according to the stage size and only if it is allowed
         if(PropertiesManager.getBoolean("window.resizable","window")) {

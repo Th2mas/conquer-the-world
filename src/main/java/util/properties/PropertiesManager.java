@@ -13,15 +13,10 @@ import java.util.stream.Collectors;
  */
 public class PropertiesManager {
 
-    /**
-     * The {@link PropertiesManager} logger
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesManager.class);
-
+    // TODO: Change that, so it can load all locales dynamically (read it from the directory)
     /**
      * The list of supported locales
      */
-    // TODO: Change that, so it can load all locales dynamically (read it from the directory)
     private static final List<Locale> SUPPORTED_LOCALES = Arrays.asList(
             Locale.forLanguageTag("en"),
             Locale.forLanguageTag("de"),
@@ -29,10 +24,10 @@ public class PropertiesManager {
             Locale.forLanguageTag("ru")
     );
 
+    // TODO: Change that, so it can load all bundles dynamically (read it from the directory)
     /**
      * The list of supported bundles, which are not language bundles
      */
-    // TODO: Change that, so it can load all bundles dynamically (read it from the directory)
     private static final List<String> SUPPORTED_BUNDLES = Arrays.asList(
             "custom",
             "settings",
@@ -70,6 +65,11 @@ public class PropertiesManager {
     private static final Map<String, ResourceBundle> BUNDLES = new HashMap<>();
 
     /**
+     * The map for all default bundles
+     */
+    private static final Map<String, ResourceBundle> DEFAULT_BUNDLES = new HashMap<>();
+
+    /**
      * Initializes the PropertiesManager
      */
     public static void initialize() {
@@ -83,6 +83,9 @@ public class PropertiesManager {
             SUPPORTED_BUNDLES.forEach(bundle -> {
                 BUNDLES.put(bundle, ResourceBundle.getBundle("properties." + bundle));
             });
+
+            // Add the default bundles
+            DEFAULT_BUNDLES.put("lang", ResourceBundle.getBundle("properties.lang", Locale.getDefault()));
 
             isInitialized = true;
         }
@@ -99,6 +102,15 @@ public class PropertiesManager {
     public static ResourceBundle getBundle(String name) {
         if(name.equalsIgnoreCase("lang")) return getBundle(locale.getLanguage());
         return BUNDLES.get(name);
+    }
+
+    /**
+     * Get the default bundle with the given name
+     * @param name the bundle's name
+     * @return the bundle
+     */
+    public static ResourceBundle getDefaultBundle(String name) {
+        return DEFAULT_BUNDLES.get(name);
     }
 
     /**
@@ -133,6 +145,16 @@ public class PropertiesManager {
      * @return the requested string
      */
     public static String getString(String key, String bundleName) { return getString(key, getBundle(bundleName)); }
+
+    /**
+     * Returns the default string to the given key
+     * @param key the key to the requested value
+     * @param bundleName the name of the default bundle
+     * @return the requested string
+     */
+    public static String getDefaultString(String key, String bundleName) {
+        return DEFAULT_BUNDLES.get(bundleName).getString(key);
+    }
 
     /**
      * Returns a list of strings, which start with startsWith

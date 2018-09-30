@@ -1,6 +1,7 @@
 package ui.game;
 
 import dto.Continent;
+import dto.Country;
 import exceptions.IllegalCommandException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,7 +18,9 @@ import util.reader.impl.SimpleMapReader;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -36,6 +39,12 @@ class LoaderController {
     private Group root;
 
     /**
+     * The map with the original polygons, belonging to the country
+     * TODO: Optimize me!
+     */
+    private final Map<String, Country> originalCountriesMap;
+
+    /**
      * Creates the game controller with the default map
      */
     LoaderController(Group root, String map){
@@ -49,13 +58,22 @@ class LoaderController {
         }
 
         this.root = root;
+        originalCountriesMap = new HashMap<>();
 
         // Draws the lines connecting the capitals
         // Default width: the settings width
         redrawLines(PropertiesManager.getInt("window.size.x", "window"));
 
         // Add all patches to the root group
-        continentList.forEach(continent -> continent.getCountries().forEach(country -> country.getPatches().forEach(patch -> root.getChildren().add(patch))));
+        continentList.forEach(continent -> continent.getCountries().forEach(country -> {
+            country.getPatches().forEach(patch -> root.getChildren().add(patch));
+
+            // Clone the country and put it into the map with its polygon list
+            Country clonedCountry = country.clone();
+
+            // Put the country inside the map with it's default name (with removed whitespaces
+            originalCountriesMap.put(clonedCountry.getBaseName(), clonedCountry);
+        }));
     }
 
     /**
@@ -106,6 +124,7 @@ class LoaderController {
 
     /**
      * Scales all patches with the given factor
+     * TODO: Move to continent service?
      * @param factorX scale factor in x direction
      * @param factorY scale factor in y direction
      */
@@ -115,60 +134,83 @@ class LoaderController {
             Translate translate = new Translate(factorX, factorY);
             Scale scale = new Scale(factorX, factorY);
 
-            country.getPatches().forEach(polygon -> {
-
-                List<Double> doubleList = resizePolygon(polygon, factorX, factorY);
-
-                // Clear the list of polygons and add the newly calculated polygons
-                polygon.getPoints().clear();
-
-                // Add the newly scaled points
-                polygon.getPoints().addAll(doubleList);
-            });
+            resizeAllPolygons(country, factorX, factorY);
 
             // Resize the position of the capital
             // Get current position
-            Point2D capital = country.getCapital();
-            capital = translate.transform(capital);
-            capital = scale.transform(capital);
+            // TODO: Change that as well...
+            //Point2D capital = country.getCapital();
+            //capital = translate.transform(capital);
+            //capital = scale.transform(capital);
 
             // Translate the position
-            country.setCapital(capital);
+            //country.setCapital(capital);
         }));
     }
 
-    public List<Double> resizePolygon(Polygon polygon, double factorX, double factorY) {
+    /**
+     * Resize the polygon
+     * @param country the country, which polygons need to be resized    -> TODO Move to continent service?
+     * @param factorX the factor in x-direction (should be in relation to the base width)   // TODO
+     * @param factorY the factor in y-direction (should be in relation to the base height)  // TODO
+     */
+    private void resizeAllPolygons(Country country, double factorX, double factorY) {
 
-        Translate translate = new Translate(factorX, factorY);
-        Scale scale = new Scale(factorX, factorY);
+        // The transformation matrices for all polygons
+        Translate translate = new Translate(1,1);
+        Scale scale = new Scale(4,4);
+        System.out.println("x: " + factorX + ", y: " + factorY);
 
-        // Create a list of Point2D
-        List<Point2D> points = new ArrayList<>();
-        List<Point2D> outPoints = new ArrayList<>();
-        ObservableList<Double> doubles = polygon.getPoints();
-        ObservableList<Double> outDoubles = FXCollections.observableArrayList();
+        // Get the original country (with all default values)
+        Country originalCountry = originalCountriesMap.get(country.getBaseName());
 
-        // Set the points
-        for(int i=0; i<doubles.size(); i+=2) points.add(new Point2D(doubles.get(i), doubles.get(i+1)));
+        // Clear the country's polygon list, so that it can be filled with the newly calculated polygon list
+        country.getPatches().clear();
 
-        points.forEach(point2D -> {
+        List<Polygon> outPolygonList = new ArrayList<>();
 
-            // Translate every point to its new position
-            Point2D newPoint = translate.transform(point2D);
+        originalCountry.getPatches().forEach(polygon -> {
 
-            // Scale every point
-            newPoint = scale.transform(newPoint);
+            // Get the polygon's points
+            List<Double> doubles = polygon.getPoints();
+            List<Point2D> points = new ArrayList<>();
 
-            // Save the points in the polygon
-            outPoints.add(newPoint);
+            List<Point2D> outPoints = new ArrayList<>();
+            ObservableList<Double> outDoubles = FXCollections.observableArrayList();
+
+            for(int i = 0; i < doubles.size(); i += 2) points.add(new Point2D(doubles.get(i), doubles.get(i+1)));
+
+            // doubles... the polygon's original position in a double list
+            // points... the polygon's original position in a point2D list
+            // outPoints... the new position of the polygon as a Point2D list
+            // outDoubles... the new position of the polygon as a double list (will be returned)
+
+            points.forEach(point2D -> {
+
+                Point2D newPoint = point2D;
+
+                // Translate every point to its new position
+                newPoint = translate.transform(newPoint);
+
+                // Scale every point
+                newPoint = scale.transform(newPoint);
+
+                // Save the points in the polygon
+                outPoints.add(newPoint);
+            });
+
+            outPoints.forEach(point2D -> {
+                outDoubles.add(point2D.getX());
+                outDoubles.add(point2D.getY());
+            });
+
+            Polygon outPolygon = new Polygon();
+            outPolygon.getPoints().addAll(outDoubles);
+            outPolygonList.add(outPolygon);
         });
 
-        outPoints.forEach(point2D -> {
-            outDoubles.add(point2D.getX());
-            outDoubles.add(point2D.getY());
-        });
-
-        return outDoubles;
+        // Set the new calculated polygons
+        country.setPatches(outPolygonList);
     }
 
     void redrawLines(double width) {

@@ -2,19 +2,15 @@
 
 <?import javafx.scene.Group?>
 <?import javafx.scene.layout.*?>
-<BorderPane
+<AnchorPane
         xmlns="http://javafx.com/javafx/9"
         xmlns:fx="http://javafx.com/fxml/1"
         fx:id="gamePane"
         fx:controller="ui.game.GameController"
         stylesheets="@/css/game_styles.css, @/css/styles.css"
         >
-    <center>
-        <AnchorPane fx:id="gameContainer" minHeight="0.0" minWidth="Infinity">
-            <Group fx:id="gameGroup"/>
-        </AnchorPane>
-    </center>
-    <bottom>
-        <AnchorPane fx:id="gameBottom" minHeight="20.0" minWidth="Infinity" maxHeight="50.0" />
-    </bottom>
-</BorderPane>
+    <AnchorPane fx:id="gameContainer" minHeight="0.0" minWidth="Infinity">
+        <Group fx:id="gameGroup"/>
+    </AnchorPane>
+    <AnchorPane fx:id="gameBottom" minHeight="0.0" minWidth="Infinity" maxHeight="50.0" prefHeight="0.0" AnchorPane.bottomAnchor="0.0" />
+</AnchorPane>

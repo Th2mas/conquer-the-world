@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.layout.*?>
-<AnchorPane
+<BorderPane
         xmlns="http://javafx.com/javafx/9"
         xmlns:fx="http://javafx.com/fxml/1"
         fx:controller="ui.MainController"
         fx:id="mainPane"
         stylesheets="@/css/main_styles.css, @/css/styles.css"
 >
-    <AnchorPane fx:id="top" id="top" AnchorPane.topAnchor="0" minWidth="Infinity" prefWidth="Infinity"/>
-    <AnchorPane fx:id="center" id="center" AnchorPane.bottomAnchor="0" minWidth="Infinity" prefWidth="Infinity"/>
-</AnchorPane>
+    <top>
+        <AnchorPane fx:id="top" id="top" AnchorPane.topAnchor="0" minWidth="Infinity" prefWidth="Infinity"/>
+    </top>
+    <center>
+        <AnchorPane fx:id="center" id="center" AnchorPane.bottomAnchor="0" minWidth="Infinity" prefWidth="Infinity"/>
+    </center>
+</BorderPane>

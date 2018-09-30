@@ -11,7 +11,6 @@ import java.util.Objects;
  * An immutable transfer object for carrying information about a country
  */
 public class Country {
-
     /**
      * The country's unique name
      */
@@ -161,18 +160,22 @@ public class Country {
 
     @Override
     public String toString() {
-
-        /*
-        StringBuilder neighborsBuilder = new StringBuilder();
-        neighbors.forEach(neighbor -> neighborsBuilder.append(neighbor.getName()).append(","));
-        neighborsBuilder.deleteCharAt(neighborsBuilder.length()-1);
-        */
-
         return "Country{" +
                 "name='" + baseName + '\'' +
                 ", patches=" + patches +
                 ", capital=" + capital +
-                //", neighbors=[" + neighborsBuilder.toString() + "]" +
                 '}';
+    }
+
+    public Country clone() {
+        List<Polygon> clonedPatches = new ArrayList<>();
+
+        patches.forEach(patch -> {
+            Polygon clonedPatch = new Polygon();
+            clonedPatch.getPoints().addAll(new ArrayList<>(patch.getPoints()));
+            clonedPatches.add(clonedPatch);
+        });
+
+        return new Country(name, clonedPatches, capital);
     }
 }

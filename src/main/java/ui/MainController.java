@@ -5,6 +5,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
@@ -42,7 +43,7 @@ public class MainController {
      * The main pane, which will contain all elements
      */
     @FXML
-    public AnchorPane mainPane;
+    public BorderPane mainPane;
 
     /**
      * The optional primary stage for closing the stage on close request
@@ -105,11 +106,9 @@ public class MainController {
             gameController.setOnKeyPressed(scene);
 
             // Bind the game controller's width and height property to the stage's width and height property
-            // TODO: Add the binding
             if(PropertiesManager.getBoolean("window.resizable","window")) {
-                primaryStage.widthProperty().addListener((observable, oldValue, newValue) -> gameController.resize((Double)oldValue, primaryStage.getHeight(), (Double)newValue, primaryStage.getHeight()));
-                primaryStage.heightProperty().addListener((observable, oldValue, newValue) -> gameController.resize(primaryStage.getWidth(), (Double)oldValue, primaryStage.getWidth(), (Double)newValue));
-
+                primaryStage.widthProperty().addListener((observable, oldValue, newValue) -> gameController.resize((Double)newValue, primaryStage.getHeight()));
+                primaryStage.heightProperty().addListener((observable, oldValue, newValue) -> gameController.resize(primaryStage.getWidth(), (Double)newValue));
             }
         }
 
