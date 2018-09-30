@@ -84,7 +84,7 @@ class LoaderController {
         // If the continentList is present, set the default colors to the continents
         continentList.forEach(continent -> {
             Color color = Color.WHITE;
-            switch (continent.getName()){
+            switch (continent.getBaseName()){
                 case "North America":
                     color = Color.valueOf(PropertiesManager.getString("Color.Continent.NorthAmerica", "custom"));
                     break;
@@ -155,62 +155,7 @@ class LoaderController {
      * @param factorY the factor in y-direction (should be in relation to the base height)  // TODO
      */
     private void resizeAllPolygons(Country country, double factorX, double factorY) {
-
-        // The transformation matrices for all polygons
-        Translate translate = new Translate(1,1);
-        Scale scale = new Scale(4,4);
-        System.out.println("x: " + factorX + ", y: " + factorY);
-
-        // Get the original country (with all default values)
-        Country originalCountry = originalCountriesMap.get(country.getBaseName());
-
-        // Clear the country's polygon list, so that it can be filled with the newly calculated polygon list
-        country.getPatches().clear();
-
-        List<Polygon> outPolygonList = new ArrayList<>();
-
-        originalCountry.getPatches().forEach(polygon -> {
-
-            // Get the polygon's points
-            List<Double> doubles = polygon.getPoints();
-            List<Point2D> points = new ArrayList<>();
-
-            List<Point2D> outPoints = new ArrayList<>();
-            ObservableList<Double> outDoubles = FXCollections.observableArrayList();
-
-            for(int i = 0; i < doubles.size(); i += 2) points.add(new Point2D(doubles.get(i), doubles.get(i+1)));
-
-            // doubles... the polygon's original position in a double list
-            // points... the polygon's original position in a point2D list
-            // outPoints... the new position of the polygon as a Point2D list
-            // outDoubles... the new position of the polygon as a double list (will be returned)
-
-            points.forEach(point2D -> {
-
-                Point2D newPoint = point2D;
-
-                // Translate every point to its new position
-                newPoint = translate.transform(newPoint);
-
-                // Scale every point
-                newPoint = scale.transform(newPoint);
-
-                // Save the points in the polygon
-                outPoints.add(newPoint);
-            });
-
-            outPoints.forEach(point2D -> {
-                outDoubles.add(point2D.getX());
-                outDoubles.add(point2D.getY());
-            });
-
-            Polygon outPolygon = new Polygon();
-            outPolygon.getPoints().addAll(outDoubles);
-            outPolygonList.add(outPolygon);
-        });
-
-        // Set the new calculated polygons
-        country.setPatches(outPolygonList);
+        // TODO: Implement me!
     }
 
     void redrawLines(double width) {
