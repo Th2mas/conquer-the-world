@@ -3,8 +3,6 @@ package ui.game;
 import dto.Continent;
 import dto.Country;
 import exceptions.IllegalCommandException;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
@@ -130,32 +128,80 @@ class LoaderController {
      */
     void resizePatches(double factorX, double factorY){
         continentList.forEach(continent -> continent.getCountries().forEach(country -> {
-
-            Translate translate = new Translate(factorX, factorY);
-            Scale scale = new Scale(factorX, factorY);
-
-            resizeAllPolygons(country, factorX, factorY);
-
-            // Resize the position of the capital
-            // Get current position
-            // TODO: Change that as well...
-            //Point2D capital = country.getCapital();
-            //capital = translate.transform(capital);
-            //capital = scale.transform(capital);
-
-            // Translate the position
-            //country.setCapital(capital);
+            //resizeCountry(country, factorX, factorY);
         }));
+        redrawLines(PropertiesManager.getInt("window.size.x","window")*factorX);
     }
 
     /**
-     * Resize the polygon
+     * Resize the country
      * @param country the country, which polygons need to be resized    -> TODO Move to continent service?
      * @param factorX the factor in x-direction (should be in relation to the base width)   // TODO
      * @param factorY the factor in y-direction (should be in relation to the base height)  // TODO
      */
-    private void resizeAllPolygons(Country country, double factorX, double factorY) {
-        // TODO: Implement me!
+    private void resizeCountry(Country country, double factorX, double factorY) {
+        // Get the original country and it's polygons
+        Country originalCountry = originalCountriesMap.get(country.getBaseName());
+
+        List<Polygon> originalPatches = originalCountry.getPatches();
+        List<Polygon> newPatches = country.getPatches();
+
+        Translate translate = new Translate(factorX, factorY);
+        Scale scale = new Scale(factorX, factorY);
+
+        if(originalPatches.size() != newPatches.size()) throw new IllegalStateException("originalPatches and newPatches must have the same length!");
+
+        Polygon originalPatch, newPatch;
+        for(int i = 0; i < originalPatches.size(); i++) {
+            originalPatch = originalPatches.get(i);
+            newPatch = newPatches.get(i);
+
+            newPatch.getPoints().clear();
+            newPatch.getPoints().addAll(originalPatch.getPoints());
+
+            // Get the current points and transform them into Point2D
+            List<Double> doubles = newPatch.getPoints();
+            List<Point2D> points = new ArrayList<>();
+            for(int j = 0; j < doubles.size(); j += 2) points.add(new Point2D(doubles.get(j), doubles.get(j+1)));
+
+            // Create two new lists, which will be used for storing the new values
+            List<Point2D> outPoints = new ArrayList<>();
+            List<Double> outDoubles = new ArrayList<>();
+
+            // Now we can transform our new patch, as it now has the standard values
+            points.forEach(point2D -> {
+                Point2D point = point2D;
+
+                // Translate the point
+                point = translate.transform(point);
+
+                // Scale the point
+                point = scale.transform(point);
+
+                outPoints.add(point);
+            });
+
+            // Store the calculated points in the doubles list
+            outPoints.forEach(point2D -> {
+                outDoubles.add(point2D.getX());
+                outDoubles.add(point2D.getY());
+            });
+
+            newPatch.getPoints().clear();
+            newPatch.getPoints().addAll(outDoubles);
+
+            country.getPatches().set(i, newPatch);
+        }
+
+        // Resize the position of the capital
+        // Get current position
+        // TODO: Change that as well...
+        Point2D capital = country.getCapital();
+        capital = translate.transform(capital);
+        capital = scale.transform(capital);
+
+        // Translate the position
+        country.setCapital(capital);
     }
 
     void redrawLines(double width) {

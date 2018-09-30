@@ -55,7 +55,7 @@ public class GameController {
      * The pane containing the game elements (containing gameBottom and gameContainer)
      */
     @FXML
-    public AnchorPane gamePane;
+    public BorderPane gamePane;
 
     /**
      * The container for additional information, such as current phase or armies
@@ -367,21 +367,20 @@ public class GameController {
     }
 
     /**
-     * TODO: Implement correct resizing
-     * Resizes all patches in the game -> TODO Move this method somewhere else...
-     * @param newWidth
-     * @param newHeight
+     * TODO: Move this method somewhere else...
+     * Resize all patches in the game
+     * @param newWidth the window's new width
+     * @param newHeight the window's new height
      */
     public void resize(double newWidth, double newHeight) {
-
-        // Calculate the factors
-        double factorX = newWidth / BASE_WIDTH;
-        double factorY = newHeight / BASE_HEIGHT;
-
-        // Scale the patches according to the stage size and only if it is allowed
+        // Only resize, if it is allowed
         if(PropertiesManager.getBoolean("window.resizable","window")) {
+            // Calculate the factors
+            double factorX = newWidth / BASE_WIDTH;
+            double factorY = newHeight / BASE_HEIGHT;
+
+            // Scale the patches according to the stage size and only if it is allowed
             loaderController.resizePatches(factorX, factorY);
-            loaderController.redrawLines(BASE_WIDTH * factorX);
         }
     }
 
