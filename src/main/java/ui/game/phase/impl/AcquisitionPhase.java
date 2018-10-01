@@ -12,6 +12,8 @@ import ui.game.GameController;
 import ui.game.phase.Phase;
 import util.properties.PropertiesManager;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * The acquisition phase
  */
@@ -47,7 +49,7 @@ public class AcquisitionPhase implements Phase {
     @Override
     public void click(Country country) {
 
-        Player currentPlayer = gameController.getPlayerService().getCurrentPlayer();
+        Player currentPlayer = SimplePlayerService.getSimplePlayerService().getCurrentPlayer();
 
         // Check if the country is not assigned
         if(gameController.getPlayerService().isCountryFree(country)) {
@@ -64,10 +66,11 @@ public class AcquisitionPhase implements Phase {
         // If the next player is a bot, then just assign a random country to it
         currentPlayer = gameController.getPlayerService().getCurrentPlayer();
 
-        while(currentPlayer.isAi()){
+        while(currentPlayer.isAi()) {
             Country randomCountry = null;
-            while(randomCountry == null){
-                Continent randomContinent = gameController.getContinentList().get((int)(Math.random()*gameController.getContinentList().size()));
+            while(randomCountry == null) {
+                int iRandomContinent = (int)(Math.random()*gameController.getContinentList().size());
+                Continent randomContinent = gameController.getContinentList().get(iRandomContinent);
                 Country test = randomContinent.getCountries().get((int)(Math.random()*randomContinent.getCountries().size()));
 
                 if(gameController.getPlayerService().isCountryFree(test))
@@ -77,17 +80,18 @@ public class AcquisitionPhase implements Phase {
             currentPlayer.addCountry(randomCountry);
             for(Polygon p : randomCountry.getPatches()) p.setFill(currentPlayer.getColor());
 
+            // Change the user, so he can play as well (can also be another AI)
             gameController.getPlayerService().nextTurn();
             currentPlayer = gameController.getPlayerService().getCurrentPlayer();
         }
 
-        // Check if all countries are assigned to a player
+        // Get the total number of countries
         int sumCountries = gameController.getContinentList().stream().mapToInt(cont -> cont.getCountries().size()).sum();
 
         // Calculate the total number of conquered countries
         int sizes = gameController.getPlayerService().getPlayers().stream().mapToInt(Player::sizeCountries).sum();
 
-        // Check if the phase switches to 'CONQUERING_ARMY_PLACEMENT'
+        // Check if the phase switches to the army placement phase
         if(sumCountries == sizes) {
             gameController.setPhase(new ArmyPlacementPhase(gameController));
             gameController.showArmiesLabel(currentPlayer);

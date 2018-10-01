@@ -97,10 +97,6 @@ public class Country {
         return patches;
     }
 
-    public void setPatches(List<Polygon> patches) {
-        this.patches = patches;
-    }
-
     /**
      * Gets the country's capital
      * @return capital
@@ -155,7 +151,7 @@ public class Country {
 
     @Override
     public int hashCode() {
-        return Objects.hash(baseName, patches, capital);//, neighbors); -> recursive call...
+        return Objects.hash(baseName);//, neighbors); -> recursive call...
     }
 
     @Override
@@ -167,6 +163,11 @@ public class Country {
                 '}';
     }
 
+    /**
+     * Clones a country
+     * @return the cloned country
+     */
+    @Override
     public Country clone() {
         List<Polygon> clonedPatches = new ArrayList<>();
 

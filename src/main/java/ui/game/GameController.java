@@ -6,17 +6,20 @@ import dto.Player;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
+import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import service.ContinentService;
 import service.PlayerService;
+import service.impl.SimpleContinentService;
 import service.impl.SimplePlayerService;
 import ui.game.phase.Phase;
 import ui.game.phase.impl.AcquisitionPhase;
@@ -30,6 +33,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * The controller, which handles the actual game logic
@@ -49,7 +53,7 @@ public class GameController {
     /**
      * Contains the {@link Text} objects for every country
      */
-    private Map<Country, Text> capitalMap;
+    private Map<String, Text> capitalMap;
 
     /**
      * The pane containing the game elements (containing gameBottom and gameContainer)
@@ -83,7 +87,12 @@ public class GameController {
     /**
      * The service for handling actions on players
      */
-    private PlayerService playerService;
+    private PlayerService playerService = SimplePlayerService.getSimplePlayerService();
+
+    /**
+     * The service for handling actions on continents
+     */
+    private ContinentService continentService = SimpleContinentService.getContinentService();
 
     /**
      * The property, which notifies all listener, if the phase was changed
@@ -115,7 +124,14 @@ public class GameController {
      */
     private Country selectedCountry;
 
+    /**
+     * The window's base width
+     */
     private static final int BASE_WIDTH = PropertiesManager.getInt("window.size.x","window");
+
+    /**
+     * The window's base height
+     */
     private static final int BASE_HEIGHT = PropertiesManager.getInt("window.size.y", "window");
 
     @FXML
@@ -124,7 +140,7 @@ public class GameController {
         LOGGER.info("Initialize");
 
         // Load the game's content
-        loaderController = new LoaderController(gameGroup, "/map/world.map");      // TODO: Let the user decide which map to use!
+        loaderController = new LoaderController("/map/world.map");      // TODO: Let the user decide which map to use!
 
         // TODO Optional: Maybe toggle colors?
         loaderController.setColors();
@@ -135,30 +151,33 @@ public class GameController {
         currentPhase = new AcquisitionPhase(this);
         capitalMap = new HashMap<>();
 
-        // Set a new player service
+        // Get all relevant services
         playerService = SimplePlayerService.getSimplePlayerService();
+        continentService = SimpleContinentService.getContinentService();
+
+        continentService.setupContinentService(gameGroup);
+        redrawLines(BASE_WIDTH);
 
         // Initialize the bottom pane
         try {
             informationController = FXMLHelper.loadFXMLController("/fxml/InfoPane.fxml");
         } catch (IOException e) {
-            LOGGER.error(e.getMessage());
+            //LOGGER.error(e.getMessage());
+            e.printStackTrace();
             return;
         }
 
         // Get the labels and bind their text properties to the respective properties
         gameBottom.getChildren().add(informationController.getView());
 
-        resetCapitalText();
-
-        // TODO: Move this elsewhere...
-        // Set the continent / country names
+        // Set the hover property
         continentList.forEach(continent -> continent.getCountries().forEach(country -> {
-            // Set the continent's locale name
-            continent.setName(PropertiesManager.getString("Continent."+continent.getBaseName().replaceAll("\\s+",""),"lang"));
-
-            // Set the country's locale name
-            country.setName(PropertiesManager.getString("Country."+country.getBaseName().replaceAll("\\s+",""), "lang"));
+            // Set the hover property: If a player hovers over a country, display the name in the information pane
+            country.getPatches().forEach(
+                    patch -> patch.hoverProperty().addListener(
+                            listener -> informationController.countryTextProperty().setValue(patch.isHover() ? country.getName() : "")
+                    )
+            );
         }));
 
         // TODO Later: Request the player's name and color
@@ -300,37 +319,29 @@ public class GameController {
         return playerService;
     }
 
-    public Map<Country, Text> getCapitalMap() {
+    public Map<String, Text> getCapitalMap() {
         return capitalMap;
     }
 
     /**
-     * Resets the text of the capitals
+     * Resets the text of the capitals (for a new game)
      */
     public void resetCapitalText() {
-        LOGGER.debug("Enter resetCapitalText");
         // Create the capital text objects and put them into the map
         continentList.forEach(continent -> continent.getCountries().forEach(country -> {
 
-            // Check, if there is already a text
-            // If there is one, remove it
-            Text oldText = capitalMap.get(country);
+            // Check, if there is already a text and remove it, if present (needed for new game)
+            Text oldText = capitalMap.get(country.getBaseName());
             if(oldText != null) gameGroup.getChildren().remove(oldText);
 
             // Create a new text
             Text text = new Text(country.getCapital().getX(), country.getCapital().getY(), "");
             text.setFill(Color.BLACK);
-
-            capitalMap.put(country, text);
-            gameGroup.getChildren().add(text);
             text.setVisible(false);
 
-            // Set the hover property: If a player hovers over a country, display the name in the information pane
-            country.getPatches().forEach(
-                    patch -> patch.hoverProperty().addListener(
-                            listener -> informationController.countryTextProperty().setValue(patch.isHover() ? country.getName() : "")
-                    )
-            );
+            capitalMap.put(country.getBaseName(), text);
+
+            gameGroup.getChildren().add(text);
         }));
     }
 
@@ -339,10 +350,10 @@ public class GameController {
      */
     public void showArmiesOnCountries(){
         continentList.forEach(continent -> continent.getCountries().forEach(country -> {
-            Text text = capitalMap.get(country);
+            Text text = capitalMap.get(country.getBaseName());
 
             playerService.getPlayers().forEach(player -> {
-                if(player.hasCountry(country)) text.setText(player.getArmies(country)+"");
+                if(player.hasCountry(country)) text.setText(player.getArmies(country) + "");
             });
 
             text.setVisible(true);
@@ -380,8 +391,62 @@ public class GameController {
             double factorY = newHeight / BASE_HEIGHT;
 
             // Scale the patches according to the stage size and only if it is allowed
-            loaderController.resizePatches(factorX, factorY);
+            continentService.resizePatches(factorX, factorY);
+            redrawLines(newWidth);
+
+            // Set the capital text to the correct position
+            moveCapitalText();
         }
+    }
+
+    private void moveCapitalText() {
+        continentList.forEach(continent -> continent.getCountries().forEach(country -> {
+            // If the text is available: Move it
+            if(capitalMap.containsKey(country.getBaseName())) {
+                Text text = capitalMap.get(country.getBaseName());
+                Point2D capital = country.getCapital();
+                text.setX(capital.getX());
+                text.setY(capital.getY());
+            }
+            // Else: Create the text
+            else {
+                resetCapitalText();
+            }
+        }));
+    }
+
+    /**
+     * Draws the lines, connecting the neighboring countries
+     * @param width the window's current width
+     */
+    private void redrawLines(double width) {
+        // Remove all lines, which might be present due to already drawn once
+        gameGroup.getChildren().removeAll(gameGroup.getChildren().stream()
+                .filter(n -> n instanceof Line)
+                .collect(Collectors.toList()));
+
+        // Add lines, which connect the countries with their neighbors
+        continentList.forEach(continent -> continent.getCountries().forEach(country -> {
+
+            // Draw the line between the country and the country's neighbors
+            country.getNeighbors().forEach(neighbor -> {
+                Line line;
+                // Check if the line length would be greater than the half of the window width
+                // If this is the case, then just draw the line to 0 or window width
+                if(Math.abs((country.getCapital().getX()-neighbor.getCapital().getX())) > width/2){
+                    // Check if the start position is on the left or right half of the screen and set the correct end x position
+                    if(country.getCapital().getX() < width/2)
+                        line = new Line(country.getCapital().getX(), country.getCapital().getY(), 0, neighbor.getCapital().getY());
+                    else
+                        line = new Line(country.getCapital().getX(), country.getCapital().getY(), width, neighbor.getCapital().getY());
+                }
+                else
+                    line = new Line(country.getCapital().getX(), country.getCapital().getY(), neighbor.getCapital().getX(), neighbor.getCapital().getY());
+
+                // Add the lines at index 0, so that all other elements will be drawn over it
+                gameGroup.getChildren().add(0, line);
+            });
+        }));
     }
 
     public Parent getView(){

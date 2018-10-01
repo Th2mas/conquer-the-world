@@ -117,9 +117,8 @@ public class MoveAndAttackPhase implements Phase {
 
     @Override
     public void setOnKeyPressed(KeyEvent event) {
-
-        switch(event.getText().toLowerCase()){
-            case "e":
+        switch(event.getCode()){
+            case E:
                 new EndRoundPhase(gameController);
                 break;
             default:

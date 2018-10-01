@@ -1,10 +1,7 @@
 package ui;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -69,7 +66,8 @@ public class MainController {
         try {
             menuController = FXMLHelper.loadFXMLController(file);
         } catch (IOException e) {
-            LOGGER.error("Could not load " + file + ": " + e.getMessage());
+            //LOGGER.error("Could not load " + file + ": " + e.getMessage());
+            e.printStackTrace();
             return;
         }
 
@@ -81,7 +79,8 @@ public class MainController {
         try {
             gameController = FXMLHelper.loadFXMLController(file);
         } catch (IOException e) {
-            LOGGER.error("Could not load " + file + ": " + e.getMessage());
+            //LOGGER.error("Could not load " + file + ": " + e.getMessage());
+            e.printStackTrace();
             return;
         }
 
@@ -111,6 +110,17 @@ public class MainController {
                 primaryStage.heightProperty().addListener((observable, oldValue, newValue) -> gameController.resize(primaryStage.getWidth(), (Double)newValue));
             }
         }
+
+        /*
+        // Define key handlers  TODO: This overwrites the phase keyevent listener...
+        scene.setOnKeyPressed(e -> {
+            switch(e.getCode()) {
+                case F11:
+                    primaryStage.setFullScreen(!primaryStage.isFullScreen());
+                    break;
+            }
+        });
+        */
 
         // Show the contents
         primaryStage.show();

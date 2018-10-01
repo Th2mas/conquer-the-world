@@ -129,7 +129,7 @@ public class SimplePlayerService implements PlayerService {
         for(Player player : players) if(player.hasCountry(defendCountry)) op = Optional.of(player);
 
         // If there is no player who owns the country -> illegal state
-        if(!op.isPresent()) throw new IllegalStateException("No player owns country " + defendCountry.getName());
+        if(!op.isPresent()) throw new IllegalStateException("No player owns country " + defendCountry.getBaseName());
 
         // Get the player the country belongs to
         Player p2 = op.get();
